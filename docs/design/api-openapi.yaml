@@ -1,0 +1,414 @@
+# OpenAPI 3.0 - 北海道 道の駅コレクション Route Handlers
+# Route Handlers のみを対象とした API 仕様
+# Server Actions / データ取得関数の仕様は api.md を参照
+
+openapi: 3.0.3
+info:
+  title: 北海道 道の駅コレクション API
+  description: |
+    北海道の道の駅（約130箇所）を地図で探し、訪問記録をスタンプラリー形式で残せるWebアプリの API 仕様。
+
+    このドキュメントは Next.js App Router の Route Handlers のみを対象としています。
+    データ変更は Server Actions、ページ表示時のデータ取得は Server Components の直接データ取得で行います。
+    詳細は `api.md` を参照してください。
+
+    ## 主な用途
+    - **道の駅データ API**: Service Worker によるオフラインキャッシュ対象
+    - **OAuth コールバック**: Supabase Auth の PKCE フロー用
+  version: 1.0.0
+  contact:
+    name: buoyup
+
+servers:
+  - url: http://localhost:3000
+    description: ローカル開発環境
+  - url: https://michinoeki-log.vercel.app
+    description: 本番環境（Vercel）
+
+tags:
+  - name: stations
+    description: 道の駅データ（オフラインキャッシュ用 JSON API）
+  - name: auth
+    description: 認証関連（OAuth コールバック）
+
+paths:
+  # ============================================================
+  # 道の駅
+  # ============================================================
+  /api/stations:
+    get:
+      tags:
+        - stations
+      summary: 道の駅一覧取得
+      description: |
+        全道の駅データを JSON で返す。約130件を一括返却する。
+        Service Worker によるオフラインキャッシュの対象エンドポイント。
+        ページネーションは不要（全件でも数十 KB 程度）。
+      operationId: getStations
+      parameters:
+        - name: area_group
+          in: query
+          description: エリアグループで絞り込み
+          required: false
+          schema:
+            type: string
+            enum:
+              - 道東
+              - 道北
+              - 道央
+              - 道南
+            example: 道央
+      responses:
+        '200':
+          description: 道の駅一覧の取得成功
+          headers:
+            Cache-Control:
+              description: キャッシュ制御ヘッダー
+              schema:
+                type: string
+                example: 'public, s-maxage=3600, stale-while-revalidate=86400'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationListResponse'
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/stations/{id}:
+    get:
+      tags:
+        - stations
+      summary: 道の駅詳細取得
+      description: |
+        指定した道の駅の詳細情報を返す。
+      operationId: getStationById
+      parameters:
+        - $ref: '#/components/parameters/StationIdParam'
+      responses:
+        '200':
+          description: 道の駅詳細の取得成功
+          headers:
+            Cache-Control:
+              description: キャッシュ制御ヘッダー
+              schema:
+                type: string
+                example: 'public, s-maxage=3600, stale-while-revalidate=86400'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StationDetailResponse'
+        '400':
+          description: パラメータ不正（UUID 形式でない等）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: 道の駅が見つからない
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: NOT_FOUND
+                  message: 指定された道の駅が見つかりません
+        '500':
+          description: サーバーエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ============================================================
+  # 認証
+  # ============================================================
+  /api/auth/callback:
+    get:
+      tags:
+        - auth
+      summary: OAuth コールバック
+      description: |
+        Supabase Auth の OAuth フロー（PKCE）でリダイレクトされるコールバックエンドポイント。
+        認証コードをセッションに交換し、指定されたパスにリダイレクトする。
+        JSON レスポンスは返さず、302 リダイレクトを行う。
+      operationId: authCallback
+      parameters:
+        - name: code
+          in: query
+          description: Supabase Auth が付与する認証コード
+          required: true
+          schema:
+            type: string
+            example: 'abc123def456'
+        - name: next
+          in: query
+          description: 認証後のリダイレクト先パス
+          required: false
+          schema:
+            type: string
+            default: '/'
+            example: '/mypage'
+      responses:
+        '302':
+          description: |
+            認証成功。`next` パラメータで指定されたパス（デフォルト: `/`）にリダイレクト。
+            profiles テーブルにレコードがない場合は自動作成される。
+          headers:
+            Location:
+              description: リダイレクト先 URL
+              schema:
+                type: string
+                example: '/'
+            Set-Cookie:
+              description: Supabase Auth のセッション Cookie
+              schema:
+                type: string
+        '400':
+          description: 認証コードが不正または期限切れ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: BAD_REQUEST
+                  message: 認証コードが不正です
+
+# ============================================================
+# 共通コンポーネント
+# ============================================================
+components:
+  parameters:
+    StationIdParam:
+      name: id
+      in: path
+      required: true
+      description: 道の駅 ID（UUID）
+      schema:
+        type: string
+        format: uuid
+        example: '550e8400-e29b-41d4-a716-446655440000'
+
+  schemas:
+    # ----------------------------------------------------------
+    # 道の駅
+    # ----------------------------------------------------------
+    Station:
+      type: object
+      required:
+        - id
+        - name
+        - address
+        - latitude
+        - longitude
+        - area
+        - areaGroup
+        - facilities
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 道の駅 ID
+          example: '550e8400-e29b-41d4-a716-446655440000'
+        name:
+          type: string
+          description: 道の駅名
+          example: '道の駅 あびらD51ステーション'
+        nameKana:
+          type: string
+          nullable: true
+          description: ふりがな（不明な場合は null）
+          example: 'あびらでぃーごじゅういちすてーしょん'
+        address:
+          type: string
+          description: 住所
+          example: '北海道勇払郡安平町追分柏が丘49-1'
+        latitude:
+          type: number
+          format: double
+          description: 緯度
+          example: 42.9072
+        longitude:
+          type: number
+          format: double
+          description: 経度
+          example: 141.8197
+        phone:
+          type: string
+          nullable: true
+          description: 電話番号
+          example: '0145-26-7789'
+        businessHours:
+          type: string
+          nullable: true
+          description: 営業時間
+          example: '9:00-18:00（11月-3月は9:00-17:00）'
+        closedDays:
+          type: string
+          nullable: true
+          description: 定休日
+          example: '年末年始（12/31-1/3）'
+        websiteUrl:
+          type: string
+          format: uri
+          nullable: true
+          description: 公式サイト URL
+          example: 'https://example.com'
+        imageUrl:
+          type: string
+          nullable: true
+          description: メイン画像 URL
+          example: '/images/stations/abira-d51.jpg'
+        area:
+          type: string
+          description: 振興局名
+          example: '胆振総合振興局'
+        areaGroup:
+          type: string
+          description: エリアグループ（道東/道北/道央/道南）
+          enum:
+            - 道東
+            - 道北
+            - 道央
+            - 道南
+          example: '道央'
+        description:
+          type: string
+          nullable: true
+          description: 説明文
+          example: 'SL「D51」を展示する鉄道記念館を併設...'
+        facilities:
+          $ref: '#/components/schemas/StationFacilities'
+
+    StationDetail:
+      description: 道の駅詳細（一覧には含まれない追加フィールドあり）
+      allOf:
+        - $ref: '#/components/schemas/Station'
+        - type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: 作成日時
+              example: '2026-01-01T00:00:00Z'
+            updatedAt:
+              type: string
+              format: date-time
+              description: 更新日時
+              example: '2026-02-01T00:00:00Z'
+
+    StationFacilities:
+      type: object
+      description: 設備情報
+      properties:
+        toilet:
+          type: boolean
+          description: トイレ
+          example: true
+        evCharger:
+          type: boolean
+          description: EV 充電器
+          example: false
+        wifi:
+          type: boolean
+          description: Wi-Fi
+          example: true
+        restaurant:
+          type: boolean
+          description: レストラン・食堂
+          example: true
+        shop:
+          type: boolean
+          description: 売店
+          example: true
+        babyRoom:
+          type: boolean
+          description: 授乳室・ベビールーム
+          example: true
+        handicapToilet:
+          type: boolean
+          description: バリアフリートイレ
+          example: true
+        atm:
+          type: boolean
+          description: ATM
+          example: false
+        information:
+          type: boolean
+          description: 案内所・情報コーナー
+          example: true
+        parking:
+          type: integer
+          nullable: true
+          description: 駐車台数（null = 不明）
+          example: 150
+
+    # ----------------------------------------------------------
+    # レスポンス
+    # ----------------------------------------------------------
+    StationListResponse:
+      type: object
+      required:
+        - data
+        - meta
+      properties:
+        data:
+          type: array
+          description: 道の駅一覧
+          items:
+            $ref: '#/components/schemas/Station'
+        meta:
+          type: object
+          required:
+            - total
+            - updatedAt
+          properties:
+            total:
+              type: integer
+              description: 道の駅の総数
+              example: 130
+            updatedAt:
+              type: string
+              format: date-time
+              description: データの最終更新日時（キャッシュ鮮度判断用）
+              example: '2026-02-09T00:00:00Z'
+
+    StationDetailResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          $ref: '#/components/schemas/StationDetail'
+
+    # ----------------------------------------------------------
+    # エラー
+    # ----------------------------------------------------------
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: エラーコード
+              enum:
+                - BAD_REQUEST
+                - NOT_FOUND
+                - INTERNAL_ERROR
+              example: NOT_FOUND
+            message:
+              type: string
+              description: エラーメッセージ（人間が読める形式）
+              example: '指定された道の駅が見つかりません'
