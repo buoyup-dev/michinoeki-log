@@ -29,12 +29,18 @@ export type Station = {
   websiteUrl: string | null;
   imageUrl: string | null;
   area: string;
-  areaGroup: string;
+  areaGroup: AreaGroup;
   description: string | null;
   facilities: StationFacilities;
   createdAt: string;
   updatedAt: string;
 };
+
+/** 一覧表示用の軽量な道の駅データ */
+export type StationListItem = Pick<
+  Station,
+  "id" | "name" | "nameKana" | "address" | "areaGroup" | "imageUrl"
+>;
 
 /** 地図表示用の軽量な道の駅データ */
 export type StationMapItem = Pick<

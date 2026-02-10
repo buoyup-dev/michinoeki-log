@@ -1,12 +1,14 @@
-export default function Home() {
+import { getStationsForMap } from "@/lib/db/queries/stations";
+import { MapView } from "@/components/features/map/MapView";
+
+export const revalidate = 3600;
+
+export default async function Home() {
+  const stations = await getStationsForMap();
+
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">北海道 道の駅コレクション</h1>
-        <p className="mt-4 text-gray-600">
-          地図・検索機能は次のステップで実装予定です
-        </p>
-      </div>
+    <div className="h-[calc(100vh-64px)]">
+      <MapView stations={stations} />
     </div>
   );
 }
