@@ -18,3 +18,6 @@ export type ActionError = {
 export type ActionResult<T = void> =
   | { success: true; data: T }
   | { success: false; error: ActionError };
+
+/** useActionState 用の初期値を含む状態型 */
+export type ActionState<T = void> = ActionResult<T> | null;
