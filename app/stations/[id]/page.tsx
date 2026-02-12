@@ -4,7 +4,9 @@ import { notFound } from "next/navigation";
 import { getStationById, getAllStationIds } from "@/lib/db/queries/stations";
 import { getUser } from "@/lib/supabase/auth";
 import { getLatestVisitToStation } from "@/lib/db/queries/visits";
+import { isFavorited as checkFavorited } from "@/lib/db/queries/favorites";
 import { StationDetail } from "@/components/features/station/StationDetail";
+import { FavoriteButton } from "@/components/features/favorite/FavoriteButton";
 import { VisitRecorder } from "@/components/features/visit/VisitRecorder";
 
 export async function generateStaticParams() {
@@ -42,12 +44,21 @@ export default async function StationDetailPage(props: {
     notFound();
   }
 
-  const latestVisit = user ? await getLatestVisitToStation(id) : null;
+  const [latestVisit, isFavorited] = user
+    ? await Promise.all([getLatestVisitToStation(id), checkFavorited(id)])
+    : [null, false];
   const justVisited = searchParams.visited === "true";
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <StationDetail station={station} />
+      <StationDetail
+        station={station}
+        actions={
+          user ? (
+            <FavoriteButton stationId={station.id} initialFavorited={isFavorited} />
+          ) : undefined
+        }
+      />
 
       {/* 訪問記録成功メッセージ */}
       {justVisited && (

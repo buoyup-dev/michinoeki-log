@@ -6,9 +6,10 @@ import { FacilityIcons } from "./FacilityIcons";
 
 type StationDetailProps = {
   station: Station;
+  actions?: React.ReactNode;
 };
 
-export function StationDetail({ station }: StationDetailProps) {
+export function StationDetail({ station, actions }: StationDetailProps) {
   return (
     <div>
       <Link
@@ -61,13 +62,16 @@ export function StationDetail({ station }: StationDetailProps) {
           </div>
         )}
 
-        <div className="mb-6 flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-gray-900">{station.name}</h1>
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${areaGroupColors[station.areaGroup] ?? "bg-gray-100 text-gray-800"}`}
-          >
-            {station.areaGroup}
-          </span>
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900">{station.name}</h1>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${areaGroupColors[station.areaGroup] ?? "bg-gray-100 text-gray-800"}`}
+            >
+              {station.areaGroup}
+            </span>
+          </div>
+          {actions}
         </div>
 
         {station.description && (

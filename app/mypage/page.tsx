@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getMyProfile } from "@/lib/db/queries/profiles";
 import { getVisitStats, getVisitHistory } from "@/lib/db/queries/visits";
+import { getFavoriteCount } from "@/lib/db/queries/favorites";
 import { VisitStatsCard } from "@/components/features/visit/VisitStatsCard";
 import { areaGroupColors } from "@/lib/utils/area-colors";
 import { ProfileForm } from "./ProfileForm";
@@ -12,10 +13,11 @@ export const metadata: Metadata = {
 };
 
 export default async function MypagePage() {
-  const [profile, stats, history] = await Promise.all([
+  const [profile, stats, history, favoriteCount] = await Promise.all([
     getMyProfile(),
     getVisitStats(),
     getVisitHistory(20),
+    getFavoriteCount(),
   ]);
 
   if (!profile) {
@@ -56,6 +58,29 @@ export default async function MypagePage() {
         </div>
 
         <ProfileForm displayName={profile.displayName} />
+      </section>
+
+      {/* お気に入り */}
+      <section className="mt-8">
+        <Link
+          href="/mypage/favorites"
+          className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 transition hover:bg-gray-50"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
+              <svg className="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
+              </svg>
+            </span>
+            <div>
+              <p className="font-medium text-gray-900">お気に入り</p>
+              <p className="text-sm text-gray-500">{favoriteCount}件</p>
+            </div>
+          </div>
+          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+          </svg>
+        </Link>
       </section>
 
       {/* 訪問統計 */}
