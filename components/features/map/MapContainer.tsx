@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import L from "leaflet";
-import type { StationMapItem } from "@/types/station";
-import type { AreaGroup } from "@/types/station";
+import type { StationMapItem, AreaGroup } from "@/types/station";
+import type { StationVisitBadgeRecord } from "@/types/badge";
 import { StationMarkers } from "./StationMarkers";
 import { MapFilterPanel } from "./MapFilterPanel";
 import { CurrentLocationButton } from "./CurrentLocationButton";
@@ -22,11 +22,12 @@ L.Icon.Default.mergeOptions({
 
 type MapContainerProps = {
   stations: StationMapItem[];
+  visitBadges?: StationVisitBadgeRecord;
 };
 
 const ALL_AREAS: AreaGroup[] = ["道東", "道北", "道央", "道南"];
 
-export default function MapContainerComponent({ stations }: MapContainerProps) {
+export default function MapContainerComponent({ stations, visitBadges }: MapContainerProps) {
   const [activeAreas, setActiveAreas] = useState<Set<AreaGroup>>(
     () => new Set(ALL_AREAS)
   );
@@ -60,7 +61,7 @@ export default function MapContainerComponent({ stations }: MapContainerProps) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <StationMarkers stations={filteredStations} />
+        <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <CurrentLocationButton />
       </LeafletMapContainer>
       <MapFilterPanel activeAreas={activeAreas} onToggle={handleToggle} />

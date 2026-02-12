@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import type { StationMapItem } from "@/types/station";
+import type { StationVisitBadgeRecord } from "@/types/badge";
 
 const MapContainer = dynamic(() => import("./MapContainer"), {
   ssr: false,
@@ -14,8 +15,9 @@ const MapContainer = dynamic(() => import("./MapContainer"), {
 
 type MapViewProps = {
   stations: StationMapItem[];
+  visitBadges?: StationVisitBadgeRecord;
 };
 
-export function MapView({ stations }: MapViewProps) {
-  return <MapContainer stations={stations} />;
+export function MapView({ stations, visitBadges }: MapViewProps) {
+  return <MapContainer stations={stations} visitBadges={visitBadges} />;
 }

@@ -2,15 +2,23 @@
 
 import { useState, useDeferredValue, useMemo } from "react";
 import type { StationListItem } from "@/types/station";
+import type { StationVisitBadgeRecord } from "@/types/badge";
 import { StationList } from "./StationList";
 
 type StationSearchBarProps = {
   stations: StationListItem[];
+  favoriteIds?: string[];
+  visitBadges?: StationVisitBadgeRecord;
 };
 
-export function StationSearchBar({ stations }: StationSearchBarProps) {
+export function StationSearchBar({ stations, favoriteIds, visitBadges }: StationSearchBarProps) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+
+  const favoriteIdsSet = useMemo(
+    () => (favoriteIds ? new Set(favoriteIds) : undefined),
+    [favoriteIds]
+  );
 
   const filtered = useMemo(
     () =>
@@ -40,7 +48,7 @@ export function StationSearchBar({ stations }: StationSearchBarProps) {
       <p className="mb-4 text-sm text-gray-500">
         {filtered.length}件の道の駅
       </p>
-      <StationList stations={filtered} />
+      <StationList stations={filtered} favoriteIds={favoriteIdsSet} visitBadges={visitBadges} />
     </div>
   );
 }

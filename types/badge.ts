@@ -27,3 +27,6 @@ export type BadgeStatus = BadgeDefinition & {
 
 /** 道の駅ごとの訪問バッジ種別（ゴールド/シルバー） */
 export type StationVisitBadge = "gold" | "silver";
+
+/** 道の駅IDをキーとした訪問バッジのレコード（RSCシリアライズ用） */
+export type StationVisitBadgeRecord = Record<string, StationVisitBadge>;

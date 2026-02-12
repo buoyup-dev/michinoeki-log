@@ -4,6 +4,21 @@ import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
 import { toVisit, toVisitWithStation, type VisitWithStationRow } from "@/lib/db/transforms/visit";
 import type { Visit, VisitWithStation, VisitStats } from "@/types/visit";
+import type { StationVisitBadgeRecord } from "@/types/badge";
+
+type VisitBadgeRow = { station_id: string; is_gps_verified: boolean };
+
+/** 道の駅ごとに最良バッジを集計（GPS認証済み=true > 自己申告=false） */
+function aggregateBestBadges(visits: VisitBadgeRow[]): Map<string, boolean> {
+  const best = new Map<string, boolean>();
+  for (const v of visits) {
+    const current = best.get(v.station_id);
+    if (current === undefined || (!current && v.is_gps_verified)) {
+      best.set(v.station_id, v.is_gps_verified);
+    }
+  }
+  return best;
+}
 
 const getTotalStationCount = cache(async function getTotalStationCount(): Promise<number> {
   const supabase = await createClient();
@@ -35,15 +50,7 @@ export const getVisitStats = cache(async function getVisitStats(): Promise<Visit
 
   const totalStations = await getTotalStationCount();
   const visits = data ?? [];
-
-  // 道の駅ごとに最良バッジを集計（Gold > Silver）
-  const bestBadgeByStation = new Map<string, boolean>();
-  for (const v of visits) {
-    const current = bestBadgeByStation.get(v.station_id);
-    if (current === undefined || (!current && v.is_gps_verified)) {
-      bestBadgeByStation.set(v.station_id, v.is_gps_verified);
-    }
-  }
+  const bestBadgeByStation = aggregateBestBadges(visits);
 
   let gpsVerifiedCount = 0;
   let selfReportedCount = 0;
@@ -108,4 +115,28 @@ export const getLatestVisitToStation = cache(async function getLatestVisitToStat
   }
 
   return data ? toVisit(data) : null;
+});
+
+export const getVisitedStationBadges = cache(async function getVisitedStationBadges(): Promise<StationVisitBadgeRecord> {
+  const user = await getUser();
+  if (!user) return {};
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("visits")
+    .select("station_id, is_gps_verified");
+
+  if (error) {
+    console.error("getVisitedStationBadges error:", error.message, error.code);
+    throw new Error("Failed to fetch visited station badges");
+  }
+
+  const visits = data ?? [];
+  const bestBadge = aggregateBestBadges(visits);
+
+  const record: StationVisitBadgeRecord = {};
+  for (const [stationId, isGps] of bestBadge) {
+    record[stationId] = isGps ? "gold" : "silver";
+  }
+  return record;
 });

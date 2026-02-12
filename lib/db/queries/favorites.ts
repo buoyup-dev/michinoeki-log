@@ -41,6 +41,23 @@ export const isFavorited = cache(async function isFavorited(stationId: string): 
   return (count ?? 0) > 0;
 });
 
+export const getFavoriteStationIds = cache(async function getFavoriteStationIds(): Promise<string[]> {
+  const user = await getUser();
+  if (!user) return [];
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("favorites")
+    .select("station_id");
+
+  if (error) {
+    console.error("getFavoriteStationIds error:", error.message, error.code);
+    throw new Error("Failed to fetch favorite station IDs");
+  }
+
+  return (data ?? []).map((row) => row.station_id);
+});
+
 export const getFavoriteCount = cache(async function getFavoriteCount(): Promise<number> {
   const user = await getUser();
   if (!user) return 0;
