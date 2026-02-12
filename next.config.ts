@@ -6,7 +6,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self'${isDev ? " 'unsafe-eval'" : ""} 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' data: https://tile.openstreetmap.org https://*.supabase.co;
+  img-src 'self' data: https://tile.openstreetmap.org https://*.supabase.co https://upload.wikimedia.org;
   connect-src 'self' https://*.supabase.co https://tile.openstreetmap.org;
   font-src 'self';
   frame-src 'none';
@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "upload.wikimedia.org" },
     ],
   },
   async headers() {

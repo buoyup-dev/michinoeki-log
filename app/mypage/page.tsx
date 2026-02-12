@@ -120,6 +120,7 @@ export default async function MypagePage() {
                       width={80}
                       height={60}
                       className="shrink-0 rounded-md object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="flex h-[60px] w-[80px] shrink-0 items-center justify-center rounded-md bg-gray-100">
