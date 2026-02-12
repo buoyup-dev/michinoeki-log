@@ -7,7 +7,7 @@ export default async function Home() {
   const stations = await getStationsForMap();
 
   return (
-    <div className="h-[calc(100vh-64px)]">
+    <div className="relative z-0 h-[calc(100vh-64px)]">
       <MapView stations={stations} />
     </div>
   );

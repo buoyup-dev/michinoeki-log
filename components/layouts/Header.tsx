@@ -26,14 +26,6 @@ export async function Header() {
           >
             一覧
           </Link>
-          {user && (
-            <Link
-              href="/mypage"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900"
-            >
-              マイページ
-            </Link>
-          )}
           {user && profile ? (
             <UserMenu
               displayName={profile.displayName}
