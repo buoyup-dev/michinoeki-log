@@ -74,6 +74,14 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
           >
             マイページ
           </Link>
+          <Link
+            href="/mypage/favorites"
+            role="menuitem"
+            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+            onClick={() => setIsOpen(false)}
+          >
+            お気に入り
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/supabase/auth";
-import { recordVisitSchema } from "@/lib/validations/visit";
+import { recordVisitSchema, updateVisitMemoSchema, deleteVisitSchema } from "@/lib/validations/visit";
 import { haversineDistance } from "@/lib/utils/geo";
 import type { ActionResult, ActionState } from "@/types/actions";
 
@@ -94,4 +94,114 @@ export async function recordVisit(
   revalidatePath(`/stations/${stationId}`);
   revalidatePath("/mypage");
   redirect(`/stations/${stationId}?visited=true`);
+}
+
+export async function updateVisitMemo(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) {
+    return {
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "ログインが必要です" },
+    };
+  }
+
+  const raw = {
+    visitId: formData.get("visitId"),
+    memo: formData.get("memo"),
+  };
+
+  const parsed = updateVisitMemoSchema.safeParse(raw);
+  if (!parsed.success) {
+    const fieldErrors: Record<string, string[]> = {};
+    for (const issue of parsed.error.issues) {
+      const key = String(issue.path[0]);
+      fieldErrors[key] = fieldErrors[key] ?? [];
+      fieldErrors[key].push(issue.message);
+    }
+    return {
+      success: false,
+      error: { code: "VALIDATION_ERROR", message: "入力内容を確認してください", fieldErrors },
+    };
+  }
+
+  const supabase = await createClient();
+
+  const { data: updatedVisits, error } = await supabase
+    .from("visits")
+    .update({ memo: parsed.data.memo || null })
+    .eq("id", parsed.data.visitId)
+    .eq("user_id", user.id)
+    .select("id");
+
+  if (error) {
+    console.error("updateVisitMemo error:", error.message, error.code);
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "メモの更新に失敗しました" },
+    };
+  }
+
+  if (!updatedVisits || updatedVisits.length === 0) {
+    return {
+      success: false,
+      error: { code: "NOT_FOUND", message: "訪問記録が見つかりません" },
+    };
+  }
+
+  revalidatePath("/mypage");
+  return { success: true, data: undefined };
+}
+
+export async function deleteVisit(
+  _prevState: ActionState,
+  formData: FormData,
+): Promise<ActionResult> {
+  const user = await getUser();
+  if (!user) {
+    return {
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "ログインが必要です" },
+    };
+  }
+
+  const raw = { visitId: formData.get("visitId") };
+  const parsed = deleteVisitSchema.safeParse(raw);
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: { code: "VALIDATION_ERROR", message: "無効なリクエストです" },
+    };
+  }
+
+  const supabase = await createClient();
+
+  // 削除と所有権検証を1クエリで実施
+  const { data: deletedVisits, error } = await supabase
+    .from("visits")
+    .delete()
+    .eq("id", parsed.data.visitId)
+    .eq("user_id", user.id)
+    .select("station_id");
+
+  if (error) {
+    console.error("deleteVisit error:", error.message, error.code);
+    return {
+      success: false,
+      error: { code: "INTERNAL_ERROR", message: "訪問記録の削除に失敗しました" },
+    };
+  }
+
+  if (!deletedVisits || deletedVisits.length === 0) {
+    return {
+      success: false,
+      error: { code: "NOT_FOUND", message: "訪問記録が見つかりません" },
+    };
+  }
+
+  revalidatePath("/mypage");
+  revalidatePath(`/stations/${deletedVisits[0].station_id}`);
+  return { success: true, data: undefined };
 }

@@ -20,3 +20,15 @@ export const recordVisitSchema = z.object({
   (d) => (d.latitude == null) === (d.longitude == null),
   { message: "緯度と経度は両方指定してください", path: ["latitude"] },
 );
+
+export const updateVisitMemoSchema = z.object({
+  visitId: z.uuid("無効な訪問IDです"),
+  memo: z
+    .string()
+    .transform((v) => v.trim())
+    .pipe(z.string().max(500, "メモは500文字以内で入力してください")),
+});
+
+export const deleteVisitSchema = z.object({
+  visitId: z.uuid("無効な訪問IDです"),
+});
