@@ -3,7 +3,44 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PROTECTED_ROUTES = ["/mypage", "/admin"];
 
+function checkBasicAuth(request: NextRequest): NextResponse | null {
+  const user = process.env.BASIC_AUTH_USER;
+  const pass = process.env.BASIC_AUTH_PASSWORD;
+
+  if (!user || !pass) return null;
+
+  const authHeader = request.headers.get("authorization");
+  if (authHeader) {
+    const [scheme, encoded] = authHeader.split(" ");
+    if (scheme === "Basic" && encoded) {
+      let decoded: string;
+      try {
+        decoded = atob(encoded);
+      } catch {
+        return new NextResponse("Unauthorized", {
+          status: 401,
+          headers: { "WWW-Authenticate": 'Basic realm="Protected"' },
+        });
+      }
+      const colonIndex = decoded.indexOf(":");
+      if (colonIndex !== -1) {
+        const u = decoded.slice(0, colonIndex);
+        const p = decoded.slice(colonIndex + 1);
+        if (u === user && p === pass) return null;
+      }
+    }
+  }
+
+  return new NextResponse("Unauthorized", {
+    status: 401,
+    headers: { "WWW-Authenticate": 'Basic realm="Protected"' },
+  });
+}
+
 export async function middleware(request: NextRequest) {
+  const basicAuthResponse = checkBasicAuth(request);
+  if (basicAuthResponse) return basicAuthResponse;
+
   let supabaseResponse = NextResponse.next({
     request,
   });
