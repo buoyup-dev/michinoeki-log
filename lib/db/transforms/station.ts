@@ -116,7 +116,7 @@ export function toMapItem(row: StationMapRow): StationMapItem {
 
 export type StationListRow = Pick<
   StationRow,
-  "id" | "name" | "name_kana" | "address" | "area_group" | "image_url"
+  "id" | "name" | "name_kana" | "address" | "area_group" | "image_url" | "facilities"
 >;
 
 export function toListItem(row: StationListRow): StationListItem {
@@ -127,5 +127,6 @@ export function toListItem(row: StationListRow): StationListItem {
     address: row.address,
     areaGroup: toAreaGroup(row.area_group),
     imageUrl: row.image_url,
+    facilities: toFacilities(row.facilities),
   };
 }

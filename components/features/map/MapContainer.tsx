@@ -5,11 +5,11 @@ import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import type { StationMapItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
-import type { MapFilters } from "@/types/map-filter";
-import { createDefaultFilters, countActiveFilters } from "@/types/map-filter";
+import type { StationFilters } from "@/types/station-filter";
+import { createDefaultFilters, countActiveFilters } from "@/types/station-filter";
 import { StationMarkers } from "./StationMarkers";
 import { MapFilterButton } from "./MapFilterButton";
-import { MapFilterSheet } from "./MapFilterSheet";
+import { StationFilterSheet } from "@/components/features/station/StationFilterSheet";
 import { CurrentLocationButton } from "./CurrentLocationButton";
 
 import "leaflet/dist/leaflet.css";
@@ -29,7 +29,7 @@ type MapContainerProps = {
 };
 
 export default function MapContainerComponent({ stations, visitBadges }: MapContainerProps) {
-  const [filters, setFilters] = useState<MapFilters>(createDefaultFilters);
+  const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
 
   const isLoggedIn = visitBadges !== undefined;
@@ -77,7 +77,7 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
         <CurrentLocationButton />
       </LeafletMapContainer>
       <MapFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
-      <MapFilterSheet
+      <StationFilterSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         filters={filters}

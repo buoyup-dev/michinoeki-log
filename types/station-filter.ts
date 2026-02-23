@@ -6,8 +6,8 @@ export type VisitFilter = "all" | "unvisited" | "visited";
 /** 施設フィルタキー（地図フィルタで使用する4種） */
 export type FacilityFilterKey = "restaurant" | "wifi" | "evCharger" | "babyRoom";
 
-/** 地図フィルタの状態 */
-export type MapFilters = {
+/** 道の駅フィルタの状態（地図・一覧共通） */
+export type StationFilters = {
   areas: Set<AreaGroup>;
   visitFilter: VisitFilter;
   facilities: Set<FacilityFilterKey>;
@@ -25,7 +25,7 @@ export const FACILITY_FILTER_OPTIONS: {
   { key: "babyRoom", label: "授乳室" },
 ];
 
-export function createDefaultFilters(): MapFilters {
+export function createDefaultFilters(): StationFilters {
   return {
     areas: new Set<AreaGroup>(ALL_AREAS),
     visitFilter: "all",
@@ -34,7 +34,7 @@ export function createDefaultFilters(): MapFilters {
 }
 
 /** デフォルトからの差分をカウント（バッジ表示用） */
-export function countActiveFilters(filters: MapFilters): number {
+export function countActiveFilters(filters: StationFilters): number {
   let count = 0;
 
   // エリア: 全選択でなければ +1（フィルタカテゴリ単位でカウント）

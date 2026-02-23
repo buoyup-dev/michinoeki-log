@@ -10,17 +10,17 @@ import {
 } from "@/components/ui/sheet";
 import type { AreaGroup } from "@/types/station";
 import type {
-  MapFilters,
+  StationFilters,
   VisitFilter,
   FacilityFilterKey,
-} from "@/types/map-filter";
-import { FACILITY_FILTER_OPTIONS, createDefaultFilters } from "@/types/map-filter";
+} from "@/types/station-filter";
+import { FACILITY_FILTER_OPTIONS, createDefaultFilters } from "@/types/station-filter";
 
-type MapFilterSheetProps = {
+type StationFilterSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  filters: MapFilters;
-  onFiltersChange: (filters: MapFilters) => void;
+  filters: StationFilters;
+  onFiltersChange: (filters: StationFilters) => void;
   isLoggedIn: boolean;
 };
 
@@ -44,13 +44,13 @@ const FACILITY_ICONS: Record<FacilityFilterKey, React.ReactNode> = {
   babyRoom: <Baby className="size-4" />,
 };
 
-export function MapFilterSheet({
+export function StationFilterSheet({
   open,
   onOpenChange,
   filters,
   onFiltersChange,
   isLoggedIn,
-}: MapFilterSheetProps) {
+}: StationFilterSheetProps) {
   function handleAreaToggle(area: AreaGroup) {
     const next = new Set(filters.areas);
     if (next.has(area)) {
@@ -90,7 +90,7 @@ export function MapFilterSheet({
           <div>
             <SheetTitle>絞り込み</SheetTitle>
             <SheetDescription className="sr-only">
-              地図に表示する道の駅を絞り込みます
+              表示する道の駅を絞り込みます
             </SheetDescription>
           </div>
           <button
