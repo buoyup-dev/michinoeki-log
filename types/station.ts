@@ -45,5 +45,5 @@ export type StationListItem = Pick<
 /** 地図表示用の軽量な道の駅データ */
 export type StationMapItem = Pick<
   Station,
-  "id" | "name" | "latitude" | "longitude" | "areaGroup" | "imageUrl"
+  "id" | "name" | "latitude" | "longitude" | "areaGroup" | "imageUrl" | "facilities"
 >;

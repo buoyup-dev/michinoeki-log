@@ -56,7 +56,7 @@ export async function getStationsForMap(): Promise<StationMapItem[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("stations")
-    .select("id, name, latitude, longitude, area_group, image_url");
+    .select("id, name, latitude, longitude, area_group, image_url, facilities");
 
   if (error) {
     console.error("getStationsForMap error:", error.message, error.code);

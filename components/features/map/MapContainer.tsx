@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { MapContainer as LeafletMapContainer, TileLayer } from "react-leaflet";
 import L from "leaflet";
-import type { StationMapItem, AreaGroup } from "@/types/station";
+import type { StationMapItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
+import type { MapFilters } from "@/types/map-filter";
+import { createDefaultFilters, countActiveFilters } from "@/types/map-filter";
 import { StationMarkers } from "./StationMarkers";
-import { MapFilterPanel } from "./MapFilterPanel";
+import { MapFilterButton } from "./MapFilterButton";
+import { MapFilterSheet } from "./MapFilterSheet";
 import { CurrentLocationButton } from "./CurrentLocationButton";
 
 import "leaflet/dist/leaflet.css";
@@ -25,29 +28,38 @@ type MapContainerProps = {
   visitBadges?: StationVisitBadgeRecord;
 };
 
-const ALL_AREAS: AreaGroup[] = ["道東", "道北", "道央", "道南"];
-
 export default function MapContainerComponent({ stations, visitBadges }: MapContainerProps) {
-  const [activeAreas, setActiveAreas] = useState<Set<AreaGroup>>(
-    () => new Set(ALL_AREAS)
-  );
+  const [filters, setFilters] = useState<MapFilters>(createDefaultFilters);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
-  const filteredStations = useMemo(
-    () => stations.filter((s) => activeAreas.has(s.areaGroup)),
-    [stations, activeAreas]
-  );
+  const isLoggedIn = visitBadges !== undefined;
 
-  function handleToggle(area: AreaGroup) {
-    setActiveAreas((prev) => {
-      const next = new Set(prev);
-      if (next.has(area)) {
-        if (next.size > 1) next.delete(area);
-      } else {
-        next.add(area);
+  const filteredStations = useMemo(() => {
+    return stations.filter((s) => {
+      // 1. エリアフィルタ
+      if (!filters.areas.has(s.areaGroup)) return false;
+
+      // 2. 訪問状況フィルタ（ログイン時のみ適用）
+      if (isLoggedIn && filters.visitFilter !== "all") {
+        const hasVisit = s.id in visitBadges;
+        if (filters.visitFilter === "visited" && !hasVisit) return false;
+        if (filters.visitFilter === "unvisited" && hasVisit) return false;
       }
-      return next;
+
+      // 3. 施設フィルタ（AND条件）
+      if (filters.facilities.size > 0) {
+        for (const key of filters.facilities) {
+          if (!s.facilities[key]) return false;
+        }
+      }
+
+      return true;
     });
-  }
+  }, [stations, filters, isLoggedIn, visitBadges]);
+
+  const activeCount = useMemo(() => countActiveFilters(filters), [filters]);
+
+  const handleOpenSheet = useCallback(() => setSheetOpen(true), []);
 
   return (
     <div className="relative h-full w-full">
@@ -64,7 +76,14 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <CurrentLocationButton />
       </LeafletMapContainer>
-      <MapFilterPanel activeAreas={activeAreas} onToggle={handleToggle} />
+      <MapFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
+      <MapFilterSheet
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+        filters={filters}
+        onFiltersChange={setFilters}
+        isLoggedIn={isLoggedIn}
+      />
     </div>
   );
 }

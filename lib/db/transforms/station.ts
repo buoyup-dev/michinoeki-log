@@ -99,7 +99,7 @@ export function toStation(row: StationRow): Station {
 
 export type StationMapRow = Pick<
   StationRow,
-  "id" | "name" | "latitude" | "longitude" | "area_group" | "image_url"
+  "id" | "name" | "latitude" | "longitude" | "area_group" | "image_url" | "facilities"
 >;
 
 export function toMapItem(row: StationMapRow): StationMapItem {
@@ -110,6 +110,7 @@ export function toMapItem(row: StationMapRow): StationMapItem {
     longitude: row.longitude,
     areaGroup: toAreaGroup(row.area_group),
     imageUrl: row.image_url,
+    facilities: toFacilities(row.facilities),
   };
 }
 
