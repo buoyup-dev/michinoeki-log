@@ -39,11 +39,11 @@ export type Station = {
 /** 一覧表示用の軽量な道の駅データ */
 export type StationListItem = Pick<
   Station,
-  "id" | "name" | "nameKana" | "address" | "areaGroup" | "imageUrl"
+  "id" | "name" | "nameKana" | "address" | "areaGroup" | "imageUrl" | "facilities"
 >;
 
 /** 地図表示用の軽量な道の駅データ */
 export type StationMapItem = Pick<
   Station,
-  "id" | "name" | "latitude" | "longitude" | "areaGroup" | "imageUrl"
+  "id" | "name" | "latitude" | "longitude" | "areaGroup" | "imageUrl" | "facilities"
 >;

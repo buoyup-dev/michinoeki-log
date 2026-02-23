@@ -168,6 +168,7 @@ describe("toMapItem", () => {
       longitude: 143.0,
       area_group: "道北",
       image_url: "https://example.com/image.jpg",
+      facilities: { toilet: true, ev_charger: false, wifi: true, restaurant: false, shop: false, baby_room: false, handicap_toilet: false, atm: false, information: false, parking: null },
     };
 
     const result = toMapItem(row);
@@ -179,6 +180,7 @@ describe("toMapItem", () => {
       longitude: 143.0,
       areaGroup: "道北",
       imageUrl: "https://example.com/image.jpg",
+      facilities: { toilet: true, evCharger: false, wifi: true, restaurant: false, shop: false, babyRoom: false, handicapToilet: false, atm: false, information: false, parking: null },
     });
   });
 });
@@ -192,6 +194,7 @@ describe("toListItem", () => {
       address: "北海道テスト市1-1",
       area_group: "道南",
       image_url: null,
+      facilities: { toilet: true, ev_charger: false, wifi: true, restaurant: false, shop: false, baby_room: false, handicap_toilet: false, atm: false, information: false, parking: null },
     };
 
     const result = toListItem(row);
@@ -203,6 +206,7 @@ describe("toListItem", () => {
       address: "北海道テスト市1-1",
       areaGroup: "道南",
       imageUrl: null,
+      facilities: { toilet: true, evCharger: false, wifi: true, restaurant: false, shop: false, babyRoom: false, handicapToilet: false, atm: false, information: false, parking: null },
     });
   });
 });

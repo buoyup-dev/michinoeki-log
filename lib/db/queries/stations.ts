@@ -41,7 +41,7 @@ export async function getStationsForList(): Promise<StationListItem[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("stations")
-    .select("id, name, name_kana, address, area_group, image_url")
+    .select("id, name, name_kana, address, area_group, image_url, facilities")
     .order("name");
 
   if (error) {
@@ -56,7 +56,7 @@ export async function getStationsForMap(): Promise<StationMapItem[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("stations")
-    .select("id, name, latitude, longitude, area_group, image_url");
+    .select("id, name, latitude, longitude, area_group, image_url, facilities");
 
   if (error) {
     console.error("getStationsForMap error:", error.message, error.code);
