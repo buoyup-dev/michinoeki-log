@@ -14,9 +14,9 @@ export function StationCard({ station, isFavorited, visitBadge }: StationCardPro
   return (
     <Link
       href={`/stations/${station.id}`}
-      className="block rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md"
+      className="block rounded-lg border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
     >
-      <div className="relative aspect-[16/9] overflow-hidden rounded-t-lg bg-gray-100">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-t-lg bg-muted">
         {station.imageUrl ? (
           <Image
             src={station.imageUrl}
@@ -27,7 +27,7 @@ export function StationCard({ station, isFavorited, visitBadge }: StationCardPro
             unoptimized
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-gray-400">
+          <div className="flex h-full items-center justify-center text-muted-foreground/70">
             <svg
               className="h-12 w-12"
               fill="none"
@@ -69,16 +69,16 @@ export function StationCard({ station, isFavorited, visitBadge }: StationCardPro
       </div>
       <div className="p-4">
         <div className="mb-2 flex items-center gap-2">
-          <h3 className="text-base font-semibold text-gray-900">
+          <h3 className="text-base font-semibold text-foreground">
             {station.name}
           </h3>
           <span
-            className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${areaGroupColors[station.areaGroup] ?? "bg-gray-100 text-gray-800"}`}
+            className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${areaGroupColors[station.areaGroup] ?? "bg-muted text-foreground"}`}
           >
             {station.areaGroup}
           </span>
         </div>
-        <p className="text-sm text-gray-500">{station.address}</p>
+        <p className="text-sm text-muted-foreground">{station.address}</p>
       </div>
     </Link>
   );

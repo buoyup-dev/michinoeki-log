@@ -5,10 +5,10 @@ const isDev = process.env.NODE_ENV === "development";
 const cspHeader = `
   default-src 'self';
   script-src 'self'${isDev ? " 'unsafe-eval'" : ""} 'unsafe-inline';
-  style-src 'self' 'unsafe-inline';
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   img-src 'self' data: https://tile.openstreetmap.org https://*.supabase.co https://upload.wikimedia.org;
   connect-src 'self' https://*.supabase.co https://tile.openstreetmap.org;
-  font-src 'self';
+  font-src 'self' https://fonts.gstatic.com;
   frame-src 'none';
   frame-ancestors 'none';
   object-src 'none';

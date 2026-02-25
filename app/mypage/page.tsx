@@ -22,7 +22,7 @@ export default async function MypagePage() {
 
   if (!profile) {
     return (
-      <div className="text-center text-gray-600">
+      <div className="text-center text-muted-foreground">
         プロフィールの読み込みに失敗しました。
       </div>
     );
@@ -30,10 +30,10 @@ export default async function MypagePage() {
 
   return (
     <>
-      <h1 className="mb-8 text-2xl font-bold text-gray-900">マイページ</h1>
+      <h1 className="mb-8 text-2xl font-bold text-foreground">マイページ</h1>
 
-      <section className="rounded-lg border border-gray-200 bg-white p-6">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">プロフィール</h2>
+      <section className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">プロフィール</h2>
 
         <div className="mb-6 flex items-center gap-4">
           {profile.avatarUrl ? (
@@ -45,13 +45,13 @@ export default async function MypagePage() {
               className="rounded-full object-cover"
             />
           ) : (
-            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 text-2xl font-medium text-blue-700">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-2xl font-medium text-primary">
               {profile.displayName.charAt(0) || "?"}
             </span>
           )}
           <div>
-            <p className="font-medium text-gray-900">{profile.displayName || "未設定"}</p>
-            <p className="text-sm text-gray-500">
+            <p className="font-medium text-foreground">{profile.displayName || "未設定"}</p>
+            <p className="text-sm text-muted-foreground">
               登録日: {new Date(profile.createdAt).toLocaleDateString("ja-JP")}
             </p>
           </div>
@@ -64,7 +64,7 @@ export default async function MypagePage() {
       <section className="mt-8">
         <Link
           href="/mypage/favorites"
-          className="flex items-center justify-between rounded-lg border border-gray-200 bg-white p-4 transition hover:bg-gray-50"
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition hover:bg-muted"
         >
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
@@ -73,11 +73,11 @@ export default async function MypagePage() {
               </svg>
             </span>
             <div>
-              <p className="font-medium text-gray-900">お気に入り</p>
-              <p className="text-sm text-gray-500">{favoriteCount}件</p>
+              <p className="font-medium text-foreground">お気に入り</p>
+              <p className="text-sm text-muted-foreground">{favoriteCount}件</p>
             </div>
           </div>
-          <svg className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+          <svg className="h-5 w-5 text-muted-foreground/70" viewBox="0 0 20 20" fill="currentColor">
             <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
           </svg>
         </Link>
@@ -92,14 +92,14 @@ export default async function MypagePage() {
 
       {/* 訪問履歴 */}
       <section className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">訪問履歴</h2>
+        <h2 className="mb-4 text-lg font-semibold text-foreground">訪問履歴</h2>
 
         {history.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 bg-white p-6 text-center">
-            <p className="text-gray-500">まだ訪問記録がありません</p>
+          <div className="rounded-lg border border-border bg-card p-6 text-center">
+            <p className="text-muted-foreground">まだ訪問記録がありません</p>
             <Link
               href="/stations"
-              className="mt-2 inline-block text-sm text-blue-600 hover:underline"
+              className="mt-2 inline-block text-sm text-primary hover:underline"
             >
               道の駅を探す
             </Link>

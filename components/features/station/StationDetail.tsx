@@ -14,7 +14,7 @@ export function StationDetail({ station, actions }: StationDetailProps) {
     <div>
       <Link
         href="/stations"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <svg
           className="h-4 w-4"
@@ -46,9 +46,9 @@ export function StationDetail({ station, actions }: StationDetailProps) {
             />
           </div>
         ) : (
-          <div className="mb-6 flex aspect-[16/9] items-center justify-center rounded-lg bg-gray-100">
+          <div className="mb-6 flex aspect-[16/9] items-center justify-center rounded-lg bg-muted">
             <svg
-              className="h-16 w-16 text-gray-300"
+              className="h-16 w-16 text-muted-foreground/50"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -65,9 +65,9 @@ export function StationDetail({ station, actions }: StationDetailProps) {
 
         <div className="mb-6 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">{station.name}</h1>
+            <h1 className="text-2xl font-bold text-foreground">{station.name}</h1>
             <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${areaGroupColors[station.areaGroup] ?? "bg-gray-100 text-gray-800"}`}
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${areaGroupColors[station.areaGroup] ?? "bg-muted text-foreground"}`}
             >
               {station.areaGroup}
             </span>
@@ -76,7 +76,7 @@ export function StationDetail({ station, actions }: StationDetailProps) {
         </div>
 
         {station.description && (
-          <p className="mb-6 text-gray-700">{station.description}</p>
+          <p className="mb-6 text-foreground">{station.description}</p>
         )}
 
         <div className="mb-8 space-y-3">
@@ -91,14 +91,14 @@ export function StationDetail({ station, actions }: StationDetailProps) {
           <InfoRow label="エリア" value={`${station.areaGroup} / ${station.area}`} />
           {station.websiteUrl && /^https?:\/\//.test(station.websiteUrl) && (
             <div className="flex gap-4">
-              <span className="w-20 shrink-0 text-sm font-medium text-gray-500">
+              <span className="w-20 shrink-0 text-sm font-medium text-muted-foreground">
                 Web
               </span>
               <a
                 href={station.websiteUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-primary hover:underline"
               >
                 公式サイト
               </a>
@@ -115,10 +115,10 @@ export function StationDetail({ station, actions }: StationDetailProps) {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex gap-4">
-      <span className="w-20 shrink-0 text-sm font-medium text-gray-500">
+      <span className="w-20 shrink-0 text-sm font-medium text-muted-foreground">
         {label}
       </span>
-      <span className="text-sm text-gray-900">{value}</span>
+      <span className="text-sm text-foreground">{value}</span>
     </div>
   );
 }

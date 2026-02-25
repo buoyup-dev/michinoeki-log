@@ -50,7 +50,7 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
   }, [deleteState]);
 
   return (
-    <li className="rounded-lg border border-gray-200 bg-white p-4">
+    <li className="rounded-lg border border-border bg-card p-4">
       <div className="flex items-start gap-4">
         {/* 道の駅画像 */}
         <Link href={`/stations/${visit.station.id}`} className="shrink-0">
@@ -64,8 +64,8 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
               unoptimized
             />
           ) : (
-            <div className="flex h-[60px] w-[80px] items-center justify-center rounded-md bg-gray-100">
-              <svg className="h-6 w-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="flex h-[60px] w-[80px] items-center justify-center rounded-md bg-muted">
+              <svg className="h-6 w-6 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
               </svg>
             </div>
@@ -77,18 +77,18 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
           <div className="flex items-center gap-2">
             <Link
               href={`/stations/${visit.station.id}`}
-              className="font-medium text-gray-900 hover:text-blue-600 hover:underline"
+              className="font-medium text-foreground hover:text-primary hover:underline"
             >
               {visit.station.name}
             </Link>
             <span
-              className={`rounded-full px-2 py-0.5 text-xs font-medium ${areaGroupColors[visit.station.areaGroup] ?? "bg-gray-100 text-gray-800"}`}
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${areaGroupColors[visit.station.areaGroup] ?? "bg-muted text-foreground"}`}
             >
               {visit.station.areaGroup}
             </span>
           </div>
 
-          <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
+          <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
             <time dateTime={visit.visitedAt}>
               {new Date(visit.visitedAt).toLocaleDateString("ja-JP")}
             </time>
@@ -112,7 +112,7 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
                 rows={2}
                 maxLength={500}
                 defaultValue={visit.memo ?? ""}
-                className="w-full rounded-md border border-gray-300 px-2 py-1.5 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-md border border-border px-2 py-1.5 text-sm placeholder:text-muted-foreground/70 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                 placeholder="メモを入力"
               />
               {memoState?.success === false && (
@@ -122,14 +122,14 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
                 <button
                   type="submit"
                   disabled={isMemoPending}
-                  className="rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                  className="rounded-md bg-primary px-3 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
                 >
                   {isMemoPending ? "保存中..." : "保存"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
-                  className="rounded-md border border-gray-300 px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-50"
+                  className="rounded-md border border-border px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted"
                 >
                   キャンセル
                 </button>
@@ -137,7 +137,7 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
             </form>
           ) : (
             visit.memo && (
-              <p className="mt-1 truncate text-sm text-gray-600">{visit.memo}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">{visit.memo}</p>
             )
           )}
 
@@ -147,7 +147,7 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="text-xs text-gray-500 hover:text-blue-600"
+                className="text-xs text-muted-foreground hover:text-primary"
               >
                 メモを編集
               </button>
@@ -155,7 +155,7 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
               <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogTrigger
                   disabled={isDeletePending}
-                  className="text-xs text-gray-500 hover:text-red-600 disabled:opacity-50"
+                  className="text-xs text-muted-foreground hover:text-red-600 disabled:opacity-50"
                 >
                   {isDeletePending ? "削除中..." : "削除"}
                 </AlertDialogTrigger>

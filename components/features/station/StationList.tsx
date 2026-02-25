@@ -11,7 +11,7 @@ type StationListProps = {
 export function StationList({ stations, favoriteIds, visitBadges }: StationListProps) {
   if (stations.length === 0) {
     return (
-      <p className="py-12 text-center text-gray-500">
+      <p className="py-12 text-center text-muted-foreground">
         該当する道の駅が見つかりませんでした
       </p>
     );

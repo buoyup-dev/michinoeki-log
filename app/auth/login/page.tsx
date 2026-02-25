@@ -13,7 +13,7 @@ export default async function LoginPage(props: {
 
   return (
     <>
-      <h1 className="mb-6 text-center text-xl font-bold text-gray-900">
+      <h1 className="mb-6 text-center text-xl font-bold text-foreground">
         ログイン
       </h1>
 
@@ -25,11 +25,11 @@ export default async function LoginPage(props: {
 
       <LoginForm next={next} />
 
-      <p className="mt-6 text-center text-sm text-gray-600">
+      <p className="mt-6 text-center text-sm text-muted-foreground">
         アカウントをお持ちでない方は{" "}
         <Link
           href="/auth/signup"
-          className="font-medium text-blue-600 hover:text-blue-500"
+          className="font-medium text-primary hover:text-primary/80"
         >
           新規登録
         </Link>

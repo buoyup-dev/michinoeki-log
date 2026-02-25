@@ -23,7 +23,7 @@ export function LoginForm({ next }: LoginFormProps) {
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="email" className="block text-sm font-medium text-foreground">
           メールアドレス
         </label>
         <input
@@ -34,7 +34,7 @@ export function LoginForm({ next }: LoginFormProps) {
           required
           aria-invalid={!!fieldErrors?.email}
           aria-describedby={fieldErrors?.email ? "email-error" : undefined}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         />
         {fieldErrors?.email && (
           <p id="email-error" className="mt-1 text-xs text-red-600">{fieldErrors.email[0]}</p>
@@ -42,7 +42,7 @@ export function LoginForm({ next }: LoginFormProps) {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="password" className="block text-sm font-medium text-foreground">
           パスワード
         </label>
         <input
@@ -53,7 +53,7 @@ export function LoginForm({ next }: LoginFormProps) {
           required
           aria-invalid={!!fieldErrors?.password}
           aria-describedby={fieldErrors?.password ? "password-error" : undefined}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 text-sm shadow-sm focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         />
         {fieldErrors?.password && (
           <p id="password-error" className="mt-1 text-xs text-red-600">{fieldErrors.password[0]}</p>
@@ -63,7 +63,7 @@ export function LoginForm({ next }: LoginFormProps) {
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isPending ? "ログイン中..." : "ログイン"}
       </button>

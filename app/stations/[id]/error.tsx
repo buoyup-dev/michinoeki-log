@@ -10,22 +10,22 @@ export default function StationDetailError({
 }) {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center">
-      <h2 className="mb-2 text-xl font-semibold text-gray-900">
+      <h2 className="mb-2 text-xl font-semibold text-foreground">
         道の駅の情報を取得できませんでした
       </h2>
-      <p className="mb-6 text-sm text-gray-500">
+      <p className="mb-6 text-sm text-muted-foreground">
         しばらくしてからもう一度お試しください。
       </p>
       <div className="flex justify-center gap-4">
         <button
           onClick={reset}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
           再試行
         </button>
         <Link
           href="/stations"
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
         >
           一覧に戻る
         </Link>

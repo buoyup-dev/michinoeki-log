@@ -46,7 +46,7 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-2 rounded-full text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        className="flex items-center gap-2 rounded-full text-sm font-medium text-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
       >
         {avatarUrl ? (
           <Image
@@ -57,7 +57,7 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
             className="rounded-full object-cover"
           />
         ) : (
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-sm font-medium text-blue-700">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
             {displayName.charAt(0) || "?"}
           </span>
         )}
@@ -65,11 +65,11 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
       </button>
 
       {isOpen && (
-        <div role="menu" className="absolute right-0 mt-2 w-48 rounded-md border border-gray-200 bg-white py-1 shadow-lg">
+        <div role="menu" className="absolute right-0 mt-2 w-48 rounded-md border border-border bg-card py-1 shadow-lg">
           <Link
             href="/mypage"
             role="menuitem"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+            className="block px-4 py-2 text-sm text-foreground hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             onClick={() => setIsOpen(false)}
           >
             マイページ
@@ -77,7 +77,7 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
           <Link
             href="/mypage/favorites"
             role="menuitem"
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+            className="block px-4 py-2 text-sm text-foreground hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             onClick={() => setIsOpen(false)}
           >
             お気に入り
@@ -86,7 +86,7 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
             <button
               type="submit"
               role="menuitem"
-              className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 focus-visible:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500"
+              className="block w-full px-4 py-2 text-left text-sm text-foreground hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
             >
               ログアウト
             </button>

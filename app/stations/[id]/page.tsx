@@ -77,11 +77,11 @@ export default async function StationDetailPage(props: {
             hasVisited={latestVisit !== null}
           />
         ) : (
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center">
-            <p className="mb-2 text-gray-600">訪問を記録するにはログインが必要です</p>
+          <div className="rounded-lg border border-border bg-muted p-6 text-center">
+            <p className="mb-2 text-muted-foreground">訪問を記録するにはログインが必要です</p>
             <Link
               href={`/auth/login?next=/stations/${id}`}
-              className="inline-block rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+              className="inline-block rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               ログイン
             </Link>

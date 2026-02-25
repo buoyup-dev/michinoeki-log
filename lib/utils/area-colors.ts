@@ -1,8 +1,8 @@
 import type { AreaGroup } from "@/types/station";
 
 export const areaGroupColors: Record<AreaGroup, string> = {
-  道東: "bg-blue-100 text-blue-800",
-  道北: "bg-green-100 text-green-800",
-  道央: "bg-orange-100 text-orange-800",
-  道南: "bg-purple-100 text-purple-800",
+  道東: "bg-[#93aec1]/20 text-[#5d8499]",
+  道北: "bg-[#9dbdba]/20 text-[#6a9a8d]",
+  道央: "bg-[#f8b042]/20 text-[#b07a1f]",
+  道南: "bg-[#ec6a52]/20 text-[#c4503a]",
 };

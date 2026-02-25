@@ -10,7 +10,7 @@ type StationPopupProps = {
 export function StationPopup({ station }: StationPopupProps) {
   return (
     <div className="w-[200px]">
-      <div className="mb-2 aspect-[16/9] overflow-hidden rounded-md bg-gray-100">
+      <div className="mb-2 aspect-[16/9] overflow-hidden rounded-md bg-muted">
         {station.imageUrl ? (
           <img
             src={station.imageUrl}
@@ -18,7 +18,7 @@ export function StationPopup({ station }: StationPopupProps) {
             className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-gray-400">
+          <div className="flex h-full items-center justify-center text-muted-foreground/70">
             <svg
               className="h-8 w-8"
               fill="none"
@@ -38,7 +38,7 @@ export function StationPopup({ station }: StationPopupProps) {
       <h3 className="mb-1 text-sm font-semibold">{station.name}</h3>
       <Link
         href={`/stations/${station.id}`}
-        className="text-xs text-blue-600 hover:underline"
+        className="text-xs text-primary hover:underline"
       >
         詳細を見る →
       </Link>

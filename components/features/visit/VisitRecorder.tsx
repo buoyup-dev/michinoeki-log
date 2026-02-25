@@ -65,8 +65,8 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
       : `「${stationName}」の訪問を記録`;
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6">
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">
+    <div className="rounded-lg border border-border bg-card p-6">
+      <h2 className="mb-4 text-lg font-semibold text-foreground">
         {hasVisited ? "再訪問を記録" : "訪問した！"}
       </h2>
 
@@ -83,7 +83,7 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
         <input type="hidden" name="longitude" ref={lonRef} defaultValue="" />
 
         {/* GPS 説明 */}
-        <p className="mb-4 text-sm text-gray-600">
+        <p className="mb-4 text-sm text-muted-foreground">
           記録時に位置情報を自動取得します。1km以内なら
           <span className="font-medium text-yellow-600"> ゴールドバッジ</span>
           、それ以外は
@@ -100,7 +100,7 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
 
         {/* メモ入力 */}
         <div className="mb-4">
-          <label htmlFor="visit-memo" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="visit-memo" className="mb-1 block text-sm font-medium text-foreground">
             メモ（任意）
           </label>
           <textarea
@@ -109,7 +109,7 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
             rows={3}
             maxLength={500}
             placeholder="訪問の感想やメモを残せます"
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-md border border-border px-3 py-2 text-sm placeholder:text-muted-foreground/70 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
             aria-invalid={state?.success === false && state.error.fieldErrors?.memo ? "true" : undefined}
             aria-describedby={state?.success === false && state.error.fieldErrors?.memo ? "memo-error" : undefined}
           />
@@ -125,7 +125,7 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
           type="button"
           onClick={handleClick}
           disabled={isProcessing}
-          className="w-full rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {buttonLabel}
         </button>

@@ -27,22 +27,22 @@ export function FacilityIcons({ facilities }: FacilityIconsProps) {
 
   return (
     <div>
-      <h2 className="mb-3 text-lg font-semibold text-gray-900">施設・設備</h2>
+      <h2 className="mb-3 text-lg font-semibold text-foreground">施設・設備</h2>
       {available.length === 0 && facilities.parking === null ? (
-        <p className="text-sm text-gray-500">施設情報はまだ登録されていません</p>
+        <p className="text-sm text-muted-foreground">施設情報はまだ登録されていません</p>
       ) : (
         <div className="flex flex-wrap gap-3">
           {available.map((item) => (
             <div
               key={item.key}
-              className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700"
+              className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm text-foreground"
             >
               <span>{item.icon}</span>
               <span>{item.label}</span>
             </div>
           ))}
           {facilities.parking !== null && (
-            <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700">
+            <div className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-sm text-foreground">
               <span>🅿️</span>
               <span>駐車場 {facilities.parking}台</span>
             </div>

@@ -19,7 +19,7 @@ function createMarkerIcon(color: string): L.DivIcon {
 
 const goldIcon = createMarkerIcon("#EAB308");
 const silverIcon = createMarkerIcon("#9CA3AF");
-const defaultIcon = createMarkerIcon("#3B82F6");
+const defaultIcon = createMarkerIcon("#2b6777");
 
 function getMarkerIcon(stationId: string, visitBadges?: StationVisitBadgeRecord): L.DivIcon {
   const badge = visitBadges?.[stationId];
