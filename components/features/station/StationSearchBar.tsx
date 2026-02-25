@@ -73,11 +73,11 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
           onChange={(e) => setQuery(e.target.value)}
           placeholder="道の駅名・住所で検索..."
           aria-label="道の駅を検索"
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm placeholder-muted-foreground/70 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         />
         <StationFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
       </div>
-      <p className="mb-4 text-sm text-gray-500">
+      <p className="mb-4 text-sm text-muted-foreground">
         {filtered.length}件の道の駅
       </p>
       <StationList stations={filtered} favoriteIds={favoriteIdsSet} visitBadges={visitBadges} />

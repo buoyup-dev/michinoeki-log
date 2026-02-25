@@ -25,10 +25,10 @@ type StationFilterSheetProps = {
 };
 
 const AREA_STYLES: { key: AreaGroup; color: string; activeColor: string }[] = [
-  { key: "道東", color: "border-blue-300 text-blue-700", activeColor: "bg-blue-500 text-white border-blue-500" },
-  { key: "道北", color: "border-green-300 text-green-700", activeColor: "bg-green-500 text-white border-green-500" },
-  { key: "道央", color: "border-orange-300 text-orange-700", activeColor: "bg-orange-500 text-white border-orange-500" },
-  { key: "道南", color: "border-purple-300 text-purple-700", activeColor: "bg-purple-500 text-white border-purple-500" },
+  { key: "道東", color: "border-[#93aec1]/50 text-[#5d8499]", activeColor: "bg-[#93aec1] text-white border-[#93aec1]" },
+  { key: "道北", color: "border-[#9dbdba]/50 text-[#6a9a8d]", activeColor: "bg-[#9dbdba] text-white border-[#9dbdba]" },
+  { key: "道央", color: "border-[#f8b042]/50 text-[#b07a1f]", activeColor: "bg-[#f8b042] text-white border-[#f8b042]" },
+  { key: "道南", color: "border-[#ec6a52]/50 text-[#c4503a]", activeColor: "bg-[#ec6a52] text-white border-[#ec6a52]" },
 ];
 
 const VISIT_OPTIONS: { key: VisitFilter; label: string }[] = [
@@ -114,7 +114,7 @@ export function StationFilterSheet({
                   onClick={() => handleAreaToggle(key)}
                   aria-pressed={filters.areas.has(key)}
                   className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    filters.areas.has(key) ? activeColor : `bg-white ${color}`
+                    filters.areas.has(key) ? activeColor : `bg-card ${color}`
                   }`}
                 >
                   {key}
@@ -138,8 +138,8 @@ export function StationFilterSheet({
                     aria-checked={filters.visitFilter === key}
                     className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                       filters.visitFilter === key
-                        ? "border-gray-900 bg-gray-900 text-white"
-                        : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                        ? "border-[#45496a] bg-[#45496a] text-white"
+                        : "border-border bg-card text-foreground hover:border-border"
                     }`}
                   >
                     {label}
@@ -162,8 +162,8 @@ export function StationFilterSheet({
                   aria-pressed={filters.facilities.has(key)}
                   className={`flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
                     filters.facilities.has(key)
-                      ? "border-teal-600 bg-teal-600 text-white"
-                      : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                      ? "border-[#45496a] bg-[#45496a] text-white"
+                      : "border-border bg-card text-foreground hover:border-border"
                   }`}
                 >
                   {FACILITY_ICONS[key]}

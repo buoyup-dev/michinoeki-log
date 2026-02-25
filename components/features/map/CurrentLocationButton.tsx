@@ -51,12 +51,12 @@ export function CurrentLocationButton() {
       <button
         onClick={handleClick}
         disabled={loading || !isSupported}
-        className="rounded-full bg-white p-2.5 shadow-md transition-colors hover:bg-gray-50 disabled:opacity-50"
+        className="rounded-full bg-card p-2.5 shadow-md transition-colors hover:bg-muted disabled:opacity-50"
         aria-label="現在地に移動"
         title={isSupported ? "現在地に移動" : "位置情報に非対応"}
       >
         <svg
-          className="h-5 w-5 text-gray-700"
+          className="h-5 w-5 text-foreground"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
