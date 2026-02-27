@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getMyProfile } from "@/lib/db/queries/profiles";
 import { ChevronLeft } from "lucide-react";
 import { ProfileForm } from "./ProfileForm";
+import { DeleteAccountSection } from "./DeleteAccountSection";
 
 export const metadata: Metadata = {
   title: "アカウント設定",
@@ -35,6 +36,10 @@ export default async function SettingsPage() {
         <h2 className="mb-4 text-lg font-semibold text-foreground">プロフィール</h2>
         <ProfileForm displayName={profile.displayName} />
       </section>
+
+      <div className="mt-8">
+        <DeleteAccountSection />
+      </div>
     </>
   );
 }
