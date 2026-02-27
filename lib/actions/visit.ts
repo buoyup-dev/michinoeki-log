@@ -152,6 +152,7 @@ export async function updateVisitMemo(
   }
 
   revalidatePath("/mypage");
+  revalidatePath("/mypage/history");
   return { success: true, data: undefined };
 }
 
@@ -202,6 +203,7 @@ export async function deleteVisit(
   }
 
   revalidatePath("/mypage");
+  revalidatePath("/mypage/history");
   revalidatePath(`/stations/${deletedVisits[0].station_id}`);
   return { success: true, data: undefined };
 }

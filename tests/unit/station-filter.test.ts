@@ -35,45 +35,89 @@ function makeStation(overrides: {
 }
 
 describe("matchesFacilityFilter", () => {
-  describe("restaurant フィルタ", () => {
+  describe("dining フィルタ", () => {
     it("restaurant=true でマッチ", () => {
-      expect(matchesFacilityFilter("restaurant", withFacilities({ restaurant: true }))).toBe(true);
+      expect(matchesFacilityFilter("dining", withFacilities({ restaurant: true }))).toBe(true);
     });
 
     it("cafe=true でもマッチ（OR条件）", () => {
-      expect(matchesFacilityFilter("restaurant", withFacilities({ cafe: true }))).toBe(true);
+      expect(matchesFacilityFilter("dining", withFacilities({ cafe: true }))).toBe(true);
     });
 
-    it("両方 false でマッチしない", () => {
-      expect(matchesFacilityFilter("restaurant", baseFacilities)).toBe(false);
+    it("farmMarket=true でもマッチ（OR条件）", () => {
+      expect(matchesFacilityFilter("dining", withFacilities({ farmMarket: true }))).toBe(true);
+    });
+
+    it("全て false でマッチしない", () => {
+      expect(matchesFacilityFilter("dining", baseFacilities)).toBe(false);
     });
   });
 
-  describe("babyRoom フィルタ", () => {
+  describe("kids フィルタ", () => {
     it("nursingRoom=true でマッチ", () => {
-      expect(matchesFacilityFilter("babyRoom", withFacilities({ nursingRoom: true }))).toBe(true);
+      expect(matchesFacilityFilter("kids", withFacilities({ nursingRoom: true }))).toBe(true);
     });
 
     it("diaperChanging=true でマッチ", () => {
-      expect(matchesFacilityFilter("babyRoom", withFacilities({ diaperChanging: true }))).toBe(true);
+      expect(matchesFacilityFilter("kids", withFacilities({ diaperChanging: true }))).toBe(true);
     });
 
     it("kidsSpace=true でマッチ", () => {
-      expect(matchesFacilityFilter("babyRoom", withFacilities({ kidsSpace: true }))).toBe(true);
+      expect(matchesFacilityFilter("kids", withFacilities({ kidsSpace: true }))).toBe(true);
     });
 
     it("3つ全て false でマッチしない", () => {
-      expect(matchesFacilityFilter("babyRoom", baseFacilities)).toBe(false);
+      expect(matchesFacilityFilter("kids", baseFacilities)).toBe(false);
+    });
+  });
+
+  describe("onsenLodging フィルタ", () => {
+    it("onsen=true でマッチ", () => {
+      expect(matchesFacilityFilter("onsenLodging", withFacilities({ onsen: true }))).toBe(true);
+    });
+
+    it("lodging=true でマッチ", () => {
+      expect(matchesFacilityFilter("onsenLodging", withFacilities({ lodging: true }))).toBe(true);
+    });
+
+    it("両方 false でマッチしない", () => {
+      expect(matchesFacilityFilter("onsenLodging", baseFacilities)).toBe(false);
+    });
+  });
+
+  describe("leisure フィルタ", () => {
+    it("park=true でマッチ", () => {
+      expect(matchesFacilityFilter("leisure", withFacilities({ park: true }))).toBe(true);
+    });
+
+    it("observatory=true でマッチ", () => {
+      expect(matchesFacilityFilter("leisure", withFacilities({ observatory: true }))).toBe(true);
+    });
+
+    it("campground=true でマッチ", () => {
+      expect(matchesFacilityFilter("leisure", withFacilities({ campground: true }))).toBe(true);
+    });
+
+    it("全て false でマッチしない", () => {
+      expect(matchesFacilityFilter("leisure", baseFacilities)).toBe(false);
     });
   });
 
   describe("単一キーフィルタ", () => {
-    it("wifi=true でマッチ", () => {
-      expect(matchesFacilityFilter("wifi", withFacilities({ wifi: true }))).toBe(true);
-    });
-
     it("evCharger=true でマッチ", () => {
       expect(matchesFacilityFilter("evCharger", withFacilities({ evCharger: true }))).toBe(true);
+    });
+
+    it("coveredParking=true でマッチ", () => {
+      expect(matchesFacilityFilter("coveredParking", withFacilities({ coveredParking: true }))).toBe(true);
+    });
+
+    it("dogRun=true でマッチ", () => {
+      expect(matchesFacilityFilter("dogRun", withFacilities({ dogRun: true }))).toBe(true);
+    });
+
+    it("museum=true でマッチ", () => {
+      expect(matchesFacilityFilter("museum", withFacilities({ museum: true }))).toBe(true);
     });
   });
 });
@@ -118,17 +162,17 @@ describe("matchesStationFilters", () => {
 
   it("施設フィルタ（AND条件）", () => {
     const filters = createDefaultFilters();
-    filters.facilities.add("wifi");
-    filters.facilities.add("restaurant");
+    filters.facilities.add("evCharger");
+    filters.facilities.add("dining");
 
-    // wifi のみ → false
+    // evCharger のみ → false
     expect(matchesStationFilters(
-      makeStation({ facilities: { wifi: true } }), filters
+      makeStation({ facilities: { evCharger: true } }), filters
     )).toBe(false);
 
-    // 両方 → true（restaurant は cafe でもOK）
+    // 両方 → true（dining は cafe でもOK）
     expect(matchesStationFilters(
-      makeStation({ facilities: { wifi: true, cafe: true } }), filters
+      makeStation({ facilities: { evCharger: true, cafe: true } }), filters
     )).toBe(true);
   });
 });
@@ -152,8 +196,8 @@ describe("countActiveFilters", () => {
 
   it("施設フィルタは選択数", () => {
     const filters = createDefaultFilters();
-    filters.facilities.add("wifi");
-    filters.facilities.add("restaurant");
+    filters.facilities.add("dining");
+    filters.facilities.add("dogRun");
     expect(countActiveFilters(filters)).toBe(2);
   });
 });

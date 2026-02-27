@@ -62,6 +62,7 @@ export async function updateProfile(
   }
 
   revalidatePath("/mypage");
+  revalidatePath("/mypage/settings");
   revalidatePath("/", "layout");
   return { success: true, data: undefined };
 }

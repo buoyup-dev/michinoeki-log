@@ -1,6 +1,9 @@
 "use client";
 
-import { UtensilsCrossed, Wifi, Zap, Baby } from "lucide-react";
+import {
+  UtensilsCrossed, Baby, Zap, CarFront,
+  Thermometer, TreePine, Dog, Landmark,
+} from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -39,10 +42,14 @@ const VISIT_OPTIONS: { key: VisitFilter; label: string }[] = [
 ];
 
 const FACILITY_ICONS: Record<FacilityFilterKey, React.ReactNode> = {
-  restaurant: <UtensilsCrossed className="size-4" />,
-  wifi: <Wifi className="size-4" />,
+  dining: <UtensilsCrossed className="size-4" />,
+  kids: <Baby className="size-4" />,
   evCharger: <Zap className="size-4" />,
-  babyRoom: <Baby className="size-4" />,
+  coveredParking: <CarFront className="size-4" />,
+  onsenLodging: <Thermometer className="size-4" />,
+  leisure: <TreePine className="size-4" />,
+  dogRun: <Dog className="size-4" />,
+  museum: <Landmark className="size-4" />,
 };
 
 export function StationFilterSheet({

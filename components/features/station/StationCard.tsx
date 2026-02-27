@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Stamp } from "lucide-react";
 import type { StationListItem } from "@/types/station";
 import type { StationVisitBadge } from "@/types/badge";
 import { areaGroupColors } from "@/lib/utils/area-colors";
@@ -46,12 +47,13 @@ export function StationCard({ station, isFavorited, visitBadge }: StationCardPro
         {visitBadge && (
           <span
             aria-hidden="true"
-            className={`absolute left-2 top-2 rounded-full px-2 py-0.5 text-xs font-bold shadow ${
+            className={`absolute left-2 top-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold shadow ${
               visitBadge === "gold"
                 ? "bg-yellow-400 text-yellow-900"
                 : "bg-gray-300 text-gray-700"
             }`}
           >
+            <Stamp className="h-3 w-3" />
             {visitBadge === "gold" ? "Gold" : "Silver"}
           </span>
         )}

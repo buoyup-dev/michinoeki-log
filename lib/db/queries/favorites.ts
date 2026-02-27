@@ -5,7 +5,10 @@ import { getUser } from "@/lib/supabase/auth";
 import { toFavoriteWithStation, type FavoriteWithStationRow } from "@/lib/db/transforms/favorite";
 import type { FavoriteWithStation } from "@/types/favorite";
 
-export const getFavorites = cache(async function getFavorites(): Promise<FavoriteWithStation[]> {
+export const getFavorites = cache(async function getFavorites(
+  limit = 20,
+  offset = 0,
+): Promise<FavoriteWithStation[]> {
   const user = await getUser();
   if (!user) return [];
 
@@ -13,7 +16,8 @@ export const getFavorites = cache(async function getFavorites(): Promise<Favorit
   const { data, error } = await supabase
     .from("favorites")
     .select("*, stations!inner(id, name, image_url, area_group, address)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     console.error("getFavorites error:", error.message, error.code);

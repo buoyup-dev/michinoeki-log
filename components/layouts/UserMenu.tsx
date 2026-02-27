@@ -82,6 +82,14 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
           >
             お気に入り
           </Link>
+          <Link
+            href="/mypage/history"
+            role="menuitem"
+            className="block px-4 py-2 text-sm text-foreground hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+            onClick={() => setIsOpen(false)}
+          >
+            訪問履歴
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

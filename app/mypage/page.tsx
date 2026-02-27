@@ -2,21 +2,20 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getMyProfile } from "@/lib/db/queries/profiles";
-import { getVisitStats, getVisitHistory } from "@/lib/db/queries/visits";
+import { getVisitStats, getVisitCount } from "@/lib/db/queries/visits";
 import { getFavoriteCount } from "@/lib/db/queries/favorites";
 import { VisitStatsCard } from "@/components/features/visit/VisitStatsCard";
-import { VisitHistoryItem } from "@/components/features/visit/VisitHistoryItem";
-import { ProfileForm } from "./ProfileForm";
+import { Settings, Heart, Clock, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "マイページ",
 };
 
 export default async function MypagePage() {
-  const [profile, stats, history, favoriteCount] = await Promise.all([
+  const [profile, stats, visitCount, favoriteCount] = await Promise.all([
     getMyProfile(),
     getVisitStats(),
-    getVisitHistory(20),
+    getVisitCount(),
     getFavoriteCount(),
   ]);
 
@@ -35,7 +34,7 @@ export default async function MypagePage() {
       <section className="rounded-lg border border-border bg-card p-6">
         <h2 className="mb-4 text-lg font-semibold text-foreground">プロフィール</h2>
 
-        <div className="mb-6 flex items-center gap-4">
+        <div className="flex items-center gap-4">
           {profile.avatarUrl ? (
             <Image
               src={profile.avatarUrl}
@@ -57,29 +56,55 @@ export default async function MypagePage() {
           </div>
         </div>
 
-        <ProfileForm displayName={profile.displayName} />
       </section>
 
-      {/* お気に入り */}
-      <section className="mt-8">
+      <section className="mt-8 space-y-3">
+        {/* アカウント設定 */}
+        <Link
+          href="/mypage/settings"
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition hover:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
+              <Settings className="h-5 w-5 text-gray-600" />
+            </span>
+            <p className="font-medium text-foreground">アカウント設定</p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground/70" />
+        </Link>
+
+        {/* お気に入り */}
         <Link
           href="/mypage/favorites"
           className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition hover:bg-muted"
         >
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
-              <svg className="h-5 w-5 text-red-500" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z" />
-              </svg>
+              <Heart className="h-5 w-5 fill-red-500 text-red-500" />
             </span>
             <div>
               <p className="font-medium text-foreground">お気に入り</p>
               <p className="text-sm text-muted-foreground">{favoriteCount}件</p>
             </div>
           </div>
-          <svg className="h-5 w-5 text-muted-foreground/70" viewBox="0 0 20 20" fill="currentColor">
-            <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-          </svg>
+          <ChevronRight className="h-5 w-5 text-muted-foreground/70" />
+        </Link>
+
+        {/* 訪問履歴 */}
+        <Link
+          href="/mypage/history"
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition hover:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+              <Clock className="h-5 w-5 text-blue-500" />
+            </span>
+            <div>
+              <p className="font-medium text-foreground">訪問履歴</p>
+              <p className="text-sm text-muted-foreground">{visitCount}件</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground/70" />
         </Link>
       </section>
 
@@ -90,28 +115,6 @@ export default async function MypagePage() {
         </section>
       )}
 
-      {/* 訪問履歴 */}
-      <section className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">訪問履歴</h2>
-
-        {history.length === 0 ? (
-          <div className="rounded-lg border border-border bg-card p-6 text-center">
-            <p className="text-muted-foreground">まだ訪問記録がありません</p>
-            <Link
-              href="/stations"
-              className="mt-2 inline-block text-sm text-primary hover:underline"
-            >
-              道の駅を探す
-            </Link>
-          </div>
-        ) : (
-          <ul className="space-y-3">
-            {history.map((visit) => (
-              <VisitHistoryItem key={visit.id} visit={visit} />
-            ))}
-          </ul>
-        )}
-      </section>
     </>
   );
 }

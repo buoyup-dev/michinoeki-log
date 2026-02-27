@@ -199,6 +199,7 @@ describe("toMapItem", () => {
     const row = {
       id: "test-id",
       name: "道の駅テスト",
+      address: "北海道テスト市1-1",
       latitude: 43.0,
       longitude: 143.0,
       area_group: "オホーツク",
@@ -211,6 +212,7 @@ describe("toMapItem", () => {
     expect(result).toEqual({
       id: "test-id",
       name: "道の駅テスト",
+      address: "北海道テスト市1-1",
       latitude: 43.0,
       longitude: 143.0,
       areaGroup: "オホーツク",

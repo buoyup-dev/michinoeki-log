@@ -98,9 +98,19 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
           </div>
         )}
 
-        {/* メモ入力 */}
-        <div className="mb-4">
-          <label htmlFor="visit-memo" className="mb-1 block text-sm font-medium text-foreground">
+        {/* 送信ボタン（type="button" で onClick → GPS取得 → requestSubmit） */}
+        <button
+          type="button"
+          onClick={handleClick}
+          disabled={isProcessing}
+          className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {buttonLabel}
+        </button>
+
+        {/* メモ入力（任意） */}
+        <div className="mt-3">
+          <label htmlFor="visit-memo" className="mb-1 block text-sm text-muted-foreground">
             メモ（任意）
           </label>
           <textarea
@@ -119,16 +129,6 @@ export function VisitRecorder({ stationId, stationName, hasVisited }: VisitRecor
             </p>
           )}
         </div>
-
-        {/* 送信ボタン（type="button" で onClick → GPS取得 → requestSubmit） */}
-        <button
-          type="button"
-          onClick={handleClick}
-          disabled={isProcessing}
-          className="w-full rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {buttonLabel}
-        </button>
       </form>
     </div>
   );

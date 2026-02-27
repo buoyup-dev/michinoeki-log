@@ -1,14 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMap } from "react-leaflet";
 
-export function CurrentLocationButton() {
+type CurrentLocationButtonProps = {
+  onAutoLocateComplete?: () => void;
+};
+
+export function CurrentLocationButton({ onAutoLocateComplete }: CurrentLocationButtonProps) {
   const map = useMap();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const isSupported = typeof window !== "undefined" && "geolocation" in navigator;
+
+  // 位置情報が許可済みなら初回マウント時に自動で現在地に移動
+  useEffect(() => {
+    if (!isSupported || !navigator.permissions) {
+      onAutoLocateComplete?.();
+      return;
+    }
+
+    navigator.permissions.query({ name: "geolocation" }).then((status) => {
+      if (status.state === "granted") {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            map.setView([pos.coords.latitude, pos.coords.longitude], 13);
+            onAutoLocateComplete?.();
+          },
+          () => { onAutoLocateComplete?.(); },
+          { enableHighAccuracy: false, timeout: 10000 }
+        );
+      } else {
+        onAutoLocateComplete?.();
+      }
+    }).catch(() => {
+      onAutoLocateComplete?.();
+    });
+  }, [map, isSupported, onAutoLocateComplete]);
 
   function handleClick() {
     if (!isSupported) {
