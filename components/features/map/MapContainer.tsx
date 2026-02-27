@@ -6,7 +6,7 @@ import L from "leaflet";
 import type { StationMapItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
 import type { StationFilters } from "@/types/station-filter";
-import { createDefaultFilters, countActiveFilters } from "@/types/station-filter";
+import { createDefaultFilters, countActiveFilters, matchesStationFilters } from "@/types/station-filter";
 import { StationMarkers } from "./StationMarkers";
 import { MapFilterButton } from "./MapFilterButton";
 import { StationFilterSheet } from "@/components/features/station/StationFilterSheet";
@@ -35,27 +35,8 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
   const isLoggedIn = visitBadges !== undefined;
 
   const filteredStations = useMemo(() => {
-    return stations.filter((s) => {
-      // 1. エリアフィルタ
-      if (!filters.areas.has(s.areaGroup)) return false;
-
-      // 2. 訪問状況フィルタ（ログイン時のみ適用）
-      if (isLoggedIn && filters.visitFilter !== "all") {
-        const hasVisit = s.id in visitBadges;
-        if (filters.visitFilter === "visited" && !hasVisit) return false;
-        if (filters.visitFilter === "unvisited" && hasVisit) return false;
-      }
-
-      // 3. 施設フィルタ（AND条件）
-      if (filters.facilities.size > 0) {
-        for (const key of filters.facilities) {
-          if (!s.facilities[key]) return false;
-        }
-      }
-
-      return true;
-    });
-  }, [stations, filters, isLoggedIn, visitBadges]);
+    return stations.filter((s) => matchesStationFilters(s, filters, visitBadges));
+  }, [stations, filters, visitBadges]);
 
   const activeCount = useMemo(() => countActiveFilters(filters), [filters]);
 

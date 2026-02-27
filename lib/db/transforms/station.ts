@@ -1,25 +1,48 @@
 import { z } from "zod/v4";
+import { AREA_GROUPS } from "@/types/station";
 import type { Station, StationListItem, StationMapItem, StationFacilities, AreaGroup } from "@/types/station";
-
-const AREA_GROUPS: readonly string[] = ["道東", "道北", "道央", "道南"];
 
 export const facilitiesSchema = z.object({
   toilet: z.boolean().default(false),
+  washlet: z.boolean().default(false),
+  handicap_toilet: z.boolean().default(false),
+  ostomy: z.boolean().default(false),
+  parking: z.boolean().default(false),
+  covered_parking: z.boolean().default(false),
   ev_charger: z.boolean().default(false),
   wifi: z.boolean().default(false),
-  restaurant: z.boolean().default(false),
-  shop: z.boolean().default(false),
-  baby_room: z.boolean().default(false),
-  handicap_toilet: z.boolean().default(false),
   atm: z.boolean().default(false),
   information: z.boolean().default(false),
-  parking: z.number().nullable().default(null),
+  shop: z.boolean().default(false),
+  restaurant: z.boolean().default(false),
+  cafe: z.boolean().default(false),
+  farm_market: z.boolean().default(false),
+  nursing_room: z.boolean().default(false),
+  diaper_changing: z.boolean().default(false),
+  kids_space: z.boolean().default(false),
+  onsen: z.boolean().default(false),
+  lodging: z.boolean().default(false),
+  campground: z.boolean().default(false),
+  observatory: z.boolean().default(false),
+  dog_run: z.boolean().default(false),
+  park: z.boolean().default(false),
+  museum: z.boolean().default(false),
+  experience: z.boolean().default(false),
+  rest_area: z.boolean().default(false),
+  credit_card: z.boolean().default(false),
+  cashless: z.boolean().default(false),
+  aed: z.boolean().default(false),
 });
 
 const DEFAULT_FACILITIES: StationFacilities = {
-  toilet: false, evCharger: false, wifi: false, restaurant: false,
-  shop: false, babyRoom: false, handicapToilet: false, atm: false,
-  information: false, parking: null,
+  toilet: false, washlet: false, handicapToilet: false, ostomy: false,
+  parking: false, coveredParking: false, evCharger: false, wifi: false,
+  atm: false, information: false, shop: false, restaurant: false,
+  cafe: false, farmMarket: false, nursingRoom: false, diaperChanging: false,
+  kidsSpace: false, onsen: false, lodging: false, campground: false,
+  observatory: false, dogRun: false, park: false, museum: false,
+  experience: false, restArea: false, creditCard: false, cashless: false,
+  aed: false,
 };
 
 export function toFacilities(raw: unknown): StationFacilities {
@@ -30,20 +53,39 @@ export function toFacilities(raw: unknown): StationFacilities {
   const f = parsed.data;
   return {
     toilet: f.toilet,
+    washlet: f.washlet,
+    handicapToilet: f.handicap_toilet,
+    ostomy: f.ostomy,
+    parking: f.parking,
+    coveredParking: f.covered_parking,
     evCharger: f.ev_charger,
     wifi: f.wifi,
-    restaurant: f.restaurant,
-    shop: f.shop,
-    babyRoom: f.baby_room,
-    handicapToilet: f.handicap_toilet,
     atm: f.atm,
     information: f.information,
-    parking: f.parking,
+    shop: f.shop,
+    restaurant: f.restaurant,
+    cafe: f.cafe,
+    farmMarket: f.farm_market,
+    nursingRoom: f.nursing_room,
+    diaperChanging: f.diaper_changing,
+    kidsSpace: f.kids_space,
+    onsen: f.onsen,
+    lodging: f.lodging,
+    campground: f.campground,
+    observatory: f.observatory,
+    dogRun: f.dog_run,
+    park: f.park,
+    museum: f.museum,
+    experience: f.experience,
+    restArea: f.rest_area,
+    creditCard: f.credit_card,
+    cashless: f.cashless,
+    aed: f.aed,
   };
 }
 
 function isAreaGroup(value: string): value is AreaGroup {
-  return AREA_GROUPS.includes(value);
+  return (AREA_GROUPS as readonly string[]).includes(value);
 }
 
 export function toAreaGroup(value: string): AreaGroup {
@@ -55,6 +97,11 @@ export function sanitizeSearchTerm(term: string): string {
   return term.replace(/[%_,.()\\]/g, "");
 }
 
+/**
+ * DBから取得した生の行データ。
+ * facilities は unknown 型とし、toFacilities() 内で Zod バリデーション＋デフォルト値
+ * フォールバックを行う設計。database.ts の Json | null とは意図的に乖離させている。
+ */
 export type StationRow = {
   id: string;
   name: string;
@@ -67,7 +114,6 @@ export type StationRow = {
   closed_days: string | null;
   website_url: string | null;
   image_url: string | null;
-  area: string;
   area_group: string;
   description: string | null;
   facilities: unknown;
@@ -88,7 +134,6 @@ export function toStation(row: StationRow): Station {
     closedDays: row.closed_days,
     websiteUrl: row.website_url,
     imageUrl: row.image_url,
-    area: row.area,
     areaGroup: toAreaGroup(row.area_group),
     description: row.description,
     facilities: toFacilities(row.facilities),
