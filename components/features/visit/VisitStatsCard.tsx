@@ -1,3 +1,4 @@
+import { Stamp } from "lucide-react";
 import type { VisitStats } from "@/types/visit";
 
 type VisitStatsCardProps = {
@@ -40,12 +41,12 @@ export function VisitStatsCard({ stats }: VisitStatsCardProps) {
         <StatItem
           label="ゴールド"
           value={stats.gpsVerifiedCount}
-          icon={<span className="text-yellow-500">●</span>}
+          icon={<Stamp className="h-4 w-4 text-yellow-500" />}
         />
         <StatItem
           label="シルバー"
           value={stats.selfReportedCount}
-          icon={<span className="text-gray-400">●</span>}
+          icon={<Stamp className="h-4 w-4 text-gray-400" />}
         />
       </div>
     </div>

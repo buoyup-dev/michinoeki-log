@@ -4,6 +4,7 @@ import { useActionState, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { updateVisitMemo, deleteVisit } from "@/lib/actions/visit";
+import { Stamp } from "lucide-react";
 import { areaGroupColors } from "@/lib/utils/area-colors";
 import {
   AlertDialog,
@@ -93,12 +94,12 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
               {new Date(visit.visitedAt).toLocaleDateString("ja-JP")}
             </time>
             {visit.isGpsVerified ? (
-              <span className="inline-flex items-center gap-0.5 text-xs font-medium text-yellow-600">
-                <span className="text-yellow-500">●</span> Gold
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-yellow-600">
+                <Stamp className="h-3.5 w-3.5 text-yellow-500" /> Gold
               </span>
             ) : (
-              <span className="inline-flex items-center gap-0.5 text-xs font-medium text-gray-400">
-                <span>●</span> Silver
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-400">
+                <Stamp className="h-3.5 w-3.5" /> Silver
               </span>
             )}
           </div>
