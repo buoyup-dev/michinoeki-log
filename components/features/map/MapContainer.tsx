@@ -31,6 +31,7 @@ type MapContainerProps = {
 export default function MapContainerComponent({ stations, visitBadges }: MapContainerProps) {
   const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
 
   const isLoggedIn = visitBadges !== undefined;
 
@@ -41,6 +42,7 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
   const activeCount = useMemo(() => countActiveFilters(filters), [filters]);
 
   const handleOpenSheet = useCallback(() => setSheetOpen(true), []);
+  const handleAutoLocateComplete = useCallback(() => setMapReady(true), []);
 
   return (
     <div className="relative h-full w-full">
@@ -55,8 +57,11 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
-        <CurrentLocationButton />
+        <CurrentLocationButton onAutoLocateComplete={handleAutoLocateComplete} />
       </LeafletMapContainer>
+      {!mapReady && (
+        <div className="absolute inset-0 z-[1001] bg-background" />
+      )}
       <MapFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
       <StationFilterSheet
         open={sheetOpen}
