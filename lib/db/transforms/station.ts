@@ -144,13 +144,14 @@ export function toStation(row: StationRow): Station {
 
 export type StationMapRow = Pick<
   StationRow,
-  "id" | "name" | "latitude" | "longitude" | "area_group" | "image_url" | "facilities"
+  "id" | "name" | "address" | "latitude" | "longitude" | "area_group" | "image_url" | "facilities"
 >;
 
 export function toMapItem(row: StationMapRow): StationMapItem {
   return {
     id: row.id,
     name: row.name,
+    address: row.address,
     latitude: row.latitude,
     longitude: row.longitude,
     areaGroup: toAreaGroup(row.area_group),

@@ -35,7 +35,8 @@ export function StationPopup({ station }: StationPopupProps) {
           </div>
         )}
       </div>
-      <h3 className="mb-1 text-sm font-semibold">{station.name}</h3>
+      <h3 className="text-sm font-semibold">{station.name}</h3>
+      <span className="block text-[11px] leading-tight text-muted-foreground">{station.address}</span>
       <Link
         href={`/stations/${station.id}`}
         className="text-xs text-primary hover:underline"
