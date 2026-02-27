@@ -88,7 +88,7 @@ export function StationDetail({ station, actions }: StationDetailProps) {
           {station.closedDays && (
             <InfoRow label="定休日" value={station.closedDays} />
           )}
-          <InfoRow label="エリア" value={`${station.areaGroup} / ${station.area}`} />
+          <InfoRow label="エリア" value={station.areaGroup} />
           {station.websiteUrl && /^https?:\/\//.test(station.websiteUrl) && (
             <div className="flex gap-4">
               <span className="w-20 shrink-0 text-sm font-medium text-muted-foreground">

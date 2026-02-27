@@ -9,35 +9,75 @@ import {
 } from "@/lib/db/transforms/station";
 import type { StationRow } from "@/lib/db/transforms/station";
 
+const FULL_FACILITIES_SNAKE = {
+  toilet: true,
+  washlet: false,
+  handicap_toilet: true,
+  ostomy: false,
+  parking: true,
+  covered_parking: false,
+  ev_charger: false,
+  wifi: true,
+  atm: false,
+  information: true,
+  shop: false,
+  restaurant: true,
+  cafe: false,
+  farm_market: false,
+  nursing_room: false,
+  diaper_changing: false,
+  kids_space: false,
+  onsen: false,
+  lodging: false,
+  campground: false,
+  observatory: false,
+  dog_run: false,
+  park: false,
+  museum: false,
+  experience: false,
+  rest_area: false,
+  credit_card: false,
+  cashless: false,
+  aed: false,
+};
+
+const FULL_FACILITIES_CAMEL = {
+  toilet: true,
+  washlet: false,
+  handicapToilet: true,
+  ostomy: false,
+  parking: true,
+  coveredParking: false,
+  evCharger: false,
+  wifi: true,
+  atm: false,
+  information: true,
+  shop: false,
+  restaurant: true,
+  cafe: false,
+  farmMarket: false,
+  nursingRoom: false,
+  diaperChanging: false,
+  kidsSpace: false,
+  onsen: false,
+  lodging: false,
+  campground: false,
+  observatory: false,
+  dogRun: false,
+  park: false,
+  museum: false,
+  experience: false,
+  restArea: false,
+  creditCard: false,
+  cashless: false,
+  aed: false,
+};
+
 describe("toFacilities", () => {
   it("正常な facilities オブジェクトを変換する", () => {
-    const raw = {
-      toilet: true,
-      ev_charger: false,
-      wifi: true,
-      restaurant: true,
-      shop: false,
-      baby_room: false,
-      handicap_toilet: true,
-      atm: false,
-      information: true,
-      parking: 50,
-    };
+    const result = toFacilities(FULL_FACILITIES_SNAKE);
 
-    const result = toFacilities(raw);
-
-    expect(result).toEqual({
-      toilet: true,
-      evCharger: false,
-      wifi: true,
-      restaurant: true,
-      shop: false,
-      babyRoom: false,
-      handicapToilet: true,
-      atm: false,
-      information: true,
-      parking: 50,
-    });
+    expect(result).toEqual(FULL_FACILITIES_CAMEL);
   });
 
   it("null の場合はデフォルト値を返す", () => {
@@ -45,14 +85,14 @@ describe("toFacilities", () => {
 
     expect(result.toilet).toBe(false);
     expect(result.evCharger).toBe(false);
-    expect(result.parking).toBeNull();
+    expect(result.parking).toBe(false);
   });
 
   it("不正な値の場合はデフォルト値を返す", () => {
     const result = toFacilities("invalid");
 
     expect(result.toilet).toBe(false);
-    expect(result.parking).toBeNull();
+    expect(result.parking).toBe(false);
   });
 
   it("一部のフィールドが欠けている場合はデフォルト値で埋める", () => {
@@ -61,29 +101,25 @@ describe("toFacilities", () => {
 
     expect(result.toilet).toBe(true);
     expect(result.wifi).toBe(false);
-    expect(result.parking).toBeNull();
-  });
-
-  it("parking が null の場合はそのまま null を返す", () => {
-    const raw = { parking: null };
-    const result = toFacilities(raw);
-
-    expect(result.parking).toBeNull();
+    expect(result.parking).toBe(false);
   });
 });
 
 describe("toAreaGroup", () => {
   it("有効なエリアグループをそのまま返す", () => {
-    expect(toAreaGroup("道東")).toBe("道東");
-    expect(toAreaGroup("道北")).toBe("道北");
     expect(toAreaGroup("道央")).toBe("道央");
     expect(toAreaGroup("道南")).toBe("道南");
+    expect(toAreaGroup("道北")).toBe("道北");
+    expect(toAreaGroup("十勝")).toBe("十勝");
+    expect(toAreaGroup("オホーツク")).toBe("オホーツク");
+    expect(toAreaGroup("釧路・根室")).toBe("釧路・根室");
   });
 
   it("無効な値の場合は道央をデフォルトとして返す", () => {
     expect(toAreaGroup("unknown")).toBe("道央");
     expect(toAreaGroup("")).toBe("道央");
     expect(toAreaGroup("東京")).toBe("道央");
+    expect(toAreaGroup("道東")).toBe("道央");
   });
 });
 
@@ -121,8 +157,7 @@ describe("toStation", () => {
     closed_days: "年末年始",
     website_url: "https://example.com",
     image_url: null,
-    area: "テスト振興局",
-    area_group: "道東",
+    area_group: "十勝",
     description: "テスト用の道の駅",
     facilities: { toilet: true, wifi: true },
     created_at: "2024-01-01T00:00:00Z",
@@ -139,7 +174,7 @@ describe("toStation", () => {
     expect(result.closedDays).toBe("年末年始");
     expect(result.websiteUrl).toBe("https://example.com");
     expect(result.imageUrl).toBeNull();
-    expect(result.areaGroup).toBe("道東");
+    expect(result.areaGroup).toBe("十勝");
     expect(result.createdAt).toBe("2024-01-01T00:00:00Z");
   });
 
@@ -166,9 +201,9 @@ describe("toMapItem", () => {
       name: "道の駅テスト",
       latitude: 43.0,
       longitude: 143.0,
-      area_group: "道北",
+      area_group: "オホーツク",
       image_url: "https://example.com/image.jpg",
-      facilities: { toilet: true, ev_charger: false, wifi: true, restaurant: false, shop: false, baby_room: false, handicap_toilet: false, atm: false, information: false, parking: null },
+      facilities: FULL_FACILITIES_SNAKE,
     };
 
     const result = toMapItem(row);
@@ -178,9 +213,9 @@ describe("toMapItem", () => {
       name: "道の駅テスト",
       latitude: 43.0,
       longitude: 143.0,
-      areaGroup: "道北",
+      areaGroup: "オホーツク",
       imageUrl: "https://example.com/image.jpg",
-      facilities: { toilet: true, evCharger: false, wifi: true, restaurant: false, shop: false, babyRoom: false, handicapToilet: false, atm: false, information: false, parking: null },
+      facilities: FULL_FACILITIES_CAMEL,
     });
   });
 });
@@ -192,9 +227,9 @@ describe("toListItem", () => {
       name: "道の駅テスト",
       name_kana: "みちのえきてすと",
       address: "北海道テスト市1-1",
-      area_group: "道南",
+      area_group: "釧路・根室",
       image_url: null,
-      facilities: { toilet: true, ev_charger: false, wifi: true, restaurant: false, shop: false, baby_room: false, handicap_toilet: false, atm: false, information: false, parking: null },
+      facilities: FULL_FACILITIES_SNAKE,
     };
 
     const result = toListItem(row);
@@ -204,9 +239,9 @@ describe("toListItem", () => {
       name: "道の駅テスト",
       nameKana: "みちのえきてすと",
       address: "北海道テスト市1-1",
-      areaGroup: "道南",
+      areaGroup: "釧路・根室",
       imageUrl: null,
-      facilities: { toilet: true, evCharger: false, wifi: true, restaurant: false, shop: false, babyRoom: false, handicapToilet: false, atm: false, information: false, parking: null },
+      facilities: FULL_FACILITIES_CAMEL,
     });
   });
 });

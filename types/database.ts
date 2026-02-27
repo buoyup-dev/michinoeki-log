@@ -100,7 +100,6 @@ export type Database = {
       stations: {
         Row: {
           address: string
-          area: string
           area_group: string
           business_hours: string | null
           closed_days: string | null
@@ -119,7 +118,6 @@ export type Database = {
         }
         Insert: {
           address: string
-          area: string
           area_group: string
           business_hours?: string | null
           closed_days?: string | null
@@ -138,7 +136,6 @@ export type Database = {
         }
         Update: {
           address?: string
-          area?: string
           area_group?: string
           business_hours?: string | null
           closed_days?: string | null

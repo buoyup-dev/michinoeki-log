@@ -8,6 +8,7 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { AREA_GROUPS } from "@/types/station";
 import type { AreaGroup } from "@/types/station";
 import type {
   StationFilters,
@@ -15,6 +16,7 @@ import type {
   FacilityFilterKey,
 } from "@/types/station-filter";
 import { FACILITY_FILTER_OPTIONS, createDefaultFilters } from "@/types/station-filter";
+import { areaStyles } from "@/lib/utils/area-colors";
 
 type StationFilterSheetProps = {
   open: boolean;
@@ -24,12 +26,11 @@ type StationFilterSheetProps = {
   isLoggedIn: boolean;
 };
 
-const AREA_STYLES: { key: AreaGroup; color: string; activeColor: string }[] = [
-  { key: "道東", color: "border-[#93aec1]/50 text-[#5d8499]", activeColor: "bg-[#93aec1] text-white border-[#93aec1]" },
-  { key: "道北", color: "border-[#9dbdba]/50 text-[#6a9a8d]", activeColor: "bg-[#9dbdba] text-white border-[#9dbdba]" },
-  { key: "道央", color: "border-[#f8b042]/50 text-[#b07a1f]", activeColor: "bg-[#f8b042] text-white border-[#f8b042]" },
-  { key: "道南", color: "border-[#ec6a52]/50 text-[#c4503a]", activeColor: "bg-[#ec6a52] text-white border-[#ec6a52]" },
-];
+const AREA_FILTER_ITEMS = AREA_GROUPS.map((key) => ({
+  key,
+  inactive: areaStyles[key].filterInactive,
+  active: areaStyles[key].filterActive,
+}));
 
 const VISIT_OPTIONS: { key: VisitFilter; label: string }[] = [
   { key: "all", label: "すべて" },
@@ -108,13 +109,13 @@ export function StationFilterSheet({
               エリア
             </h3>
             <div className="flex flex-wrap gap-2" role="group" aria-label="エリアフィルタ">
-              {AREA_STYLES.map(({ key, color, activeColor }) => (
+              {AREA_FILTER_ITEMS.map(({ key, inactive, active }) => (
                 <button
                   key={key}
                   onClick={() => handleAreaToggle(key)}
                   aria-pressed={filters.areas.has(key)}
                   className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
-                    filters.areas.has(key) ? activeColor : `bg-card ${color}`
+                    filters.areas.has(key) ? active : `bg-card ${inactive}`
                   }`}
                 >
                   {key}

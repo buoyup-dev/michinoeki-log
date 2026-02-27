@@ -3,7 +3,7 @@
 import { useState, useDeferredValue, useMemo, useCallback } from "react";
 import type { StationListItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
-import { createDefaultFilters, countActiveFilters } from "@/types/station-filter";
+import { createDefaultFilters, countActiveFilters, matchesStationFilters } from "@/types/station-filter";
 import type { StationFilters } from "@/types/station-filter";
 import { StationList } from "./StationList";
 import { StationFilterButton } from "./StationFilterButton";
@@ -41,26 +41,10 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
         if (!matchesText) return false;
       }
 
-      // 2. エリアフィルタ
-      if (!filters.areas.has(s.areaGroup)) return false;
-
-      // 3. 訪問状況フィルタ（ログイン時のみ適用）
-      if (isLoggedIn && filters.visitFilter !== "all") {
-        const hasVisit = s.id in visitBadges;
-        if (filters.visitFilter === "visited" && !hasVisit) return false;
-        if (filters.visitFilter === "unvisited" && hasVisit) return false;
-      }
-
-      // 4. 施設フィルタ（AND条件）
-      if (filters.facilities.size > 0) {
-        for (const key of filters.facilities) {
-          if (!s.facilities[key]) return false;
-        }
-      }
-
-      return true;
+      // 2. エリア・訪問・施設フィルタ
+      return matchesStationFilters(s, filters, visitBadges);
     });
-  }, [stations, deferredQuery, filters, isLoggedIn, visitBadges]);
+  }, [stations, deferredQuery, filters, visitBadges]);
 
   const handleOpenSheet = useCallback(() => setSheetOpen(true), []);
 

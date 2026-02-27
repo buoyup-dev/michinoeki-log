@@ -1,18 +1,40 @@
-/** エリアグループ */
-export type AreaGroup = "道東" | "道北" | "道央" | "道南";
+/** エリアグループ定数（6区分） — 全てのエリア関連定義の唯一のソース */
+export const AREA_GROUPS = ["道央", "道南", "道北", "十勝", "オホーツク", "釧路・根室"] as const;
 
-/** 道の駅の設備情報（camelCase） */
+/** エリアグループ型 */
+export type AreaGroup = (typeof AREA_GROUPS)[number];
+
+/** 道の駅の設備情報（camelCase、全29キー boolean） */
 export type StationFacilities = {
   toilet: boolean;
+  washlet: boolean;
+  handicapToilet: boolean;
+  ostomy: boolean;
+  parking: boolean;
+  coveredParking: boolean;
   evCharger: boolean;
   wifi: boolean;
-  restaurant: boolean;
-  shop: boolean;
-  babyRoom: boolean;
-  handicapToilet: boolean;
   atm: boolean;
   information: boolean;
-  parking: number | null;
+  shop: boolean;
+  restaurant: boolean;
+  cafe: boolean;
+  farmMarket: boolean;
+  nursingRoom: boolean;
+  diaperChanging: boolean;
+  kidsSpace: boolean;
+  onsen: boolean;
+  lodging: boolean;
+  campground: boolean;
+  observatory: boolean;
+  dogRun: boolean;
+  park: boolean;
+  museum: boolean;
+  experience: boolean;
+  restArea: boolean;
+  creditCard: boolean;
+  cashless: boolean;
+  aed: boolean;
 };
 
 /** 道の駅（アプリケーション層 camelCase 型） */
@@ -28,7 +50,6 @@ export type Station = {
   closedDays: string | null;
   websiteUrl: string | null;
   imageUrl: string | null;
-  area: string;
   areaGroup: AreaGroup;
   description: string | null;
   facilities: StationFacilities;
