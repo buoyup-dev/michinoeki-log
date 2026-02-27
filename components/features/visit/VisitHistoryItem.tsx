@@ -137,7 +137,7 @@ export function VisitHistoryItem({ visit }: VisitHistoryItemProps) {
             </form>
           ) : (
             visit.memo && (
-              <p className="mt-1 truncate text-sm text-muted-foreground">{visit.memo}</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{visit.memo}</p>
             )
           )}
 
