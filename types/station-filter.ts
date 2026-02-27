@@ -4,15 +4,27 @@ import type { AreaGroup, StationFacilities } from "./station";
 /** 訪問状況フィルタ */
 export type VisitFilter = "all" | "unvisited" | "visited";
 
-/** 施設フィルタキー（地図フィルタで使用する4種） */
-export type FacilityFilterKey = "restaurant" | "wifi" | "evCharger" | "babyRoom";
+/** 施設フィルタキー（カテゴリ別8種） */
+export type FacilityFilterKey =
+  | "dining"
+  | "kids"
+  | "evCharger"
+  | "coveredParking"
+  | "onsenLodging"
+  | "leisure"
+  | "dogRun"
+  | "museum";
 
 /** 施設フィルタキーに対応する facilities キーのマッピング（OR条件） */
 export const FACILITY_FILTER_MATCH: Record<FacilityFilterKey, (keyof StationFacilities)[]> = {
-  restaurant: ["restaurant", "cafe"],
-  wifi: ["wifi"],
+  dining: ["restaurant", "cafe", "farmMarket"],
+  kids: ["nursingRoom", "diaperChanging", "kidsSpace"],
   evCharger: ["evCharger"],
-  babyRoom: ["nursingRoom", "diaperChanging", "kidsSpace"],
+  coveredParking: ["coveredParking"],
+  onsenLodging: ["onsen", "lodging"],
+  leisure: ["park", "observatory", "campground"],
+  dogRun: ["dogRun"],
+  museum: ["museum"],
 };
 
 /** 施設フィルタが道の駅にマッチするか判定 */
@@ -36,10 +48,14 @@ export const FACILITY_FILTER_OPTIONS: {
   key: FacilityFilterKey;
   label: string;
 }[] = [
-  { key: "restaurant", label: "レストラン" },
-  { key: "wifi", label: "Wi-Fi" },
-  { key: "evCharger", label: "EV充電器" },
-  { key: "babyRoom", label: "ベビー" },
+  { key: "dining", label: "飲食" },
+  { key: "kids", label: "子連れ" },
+  { key: "evCharger", label: "EV充電" },
+  { key: "coveredParking", label: "屋根付きP" },
+  { key: "onsenLodging", label: "温泉・宿泊" },
+  { key: "leisure", label: "レジャー" },
+  { key: "dogRun", label: "ドッグラン" },
+  { key: "museum", label: "博物館" },
 ];
 
 export function createDefaultFilters(): StationFilters {
