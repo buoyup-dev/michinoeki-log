@@ -2,21 +2,20 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { getMyProfile } from "@/lib/db/queries/profiles";
-import { getVisitStats, getVisitHistory } from "@/lib/db/queries/visits";
+import { getVisitStats, getVisitCount } from "@/lib/db/queries/visits";
 import { getFavoriteCount } from "@/lib/db/queries/favorites";
 import { VisitStatsCard } from "@/components/features/visit/VisitStatsCard";
-import { VisitHistoryItem } from "@/components/features/visit/VisitHistoryItem";
-import { Settings, Heart, ChevronRight } from "lucide-react";
+import { Settings, Heart, Clock, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "マイページ",
 };
 
 export default async function MypagePage() {
-  const [profile, stats, history, favoriteCount] = await Promise.all([
+  const [profile, stats, visitCount, favoriteCount] = await Promise.all([
     getMyProfile(),
     getVisitStats(),
-    getVisitHistory(20),
+    getVisitCount(),
     getFavoriteCount(),
   ]);
 
@@ -90,6 +89,23 @@ export default async function MypagePage() {
           </div>
           <ChevronRight className="h-5 w-5 text-muted-foreground/70" />
         </Link>
+
+        {/* 訪問履歴 */}
+        <Link
+          href="/mypage/history"
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition hover:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+              <Clock className="h-5 w-5 text-blue-500" />
+            </span>
+            <div>
+              <p className="font-medium text-foreground">訪問履歴</p>
+              <p className="text-sm text-muted-foreground">{visitCount}件</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground/70" />
+        </Link>
       </section>
 
       {/* 訪問統計 */}
@@ -99,28 +115,6 @@ export default async function MypagePage() {
         </section>
       )}
 
-      {/* 訪問履歴 */}
-      <section className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">訪問履歴</h2>
-
-        {history.length === 0 ? (
-          <div className="rounded-lg border border-border bg-card p-6 text-center">
-            <p className="text-muted-foreground">まだ訪問記録がありません</p>
-            <Link
-              href="/stations"
-              className="mt-2 inline-block text-sm text-primary hover:underline"
-            >
-              道の駅を探す
-            </Link>
-          </div>
-        ) : (
-          <ul className="space-y-3">
-            {history.map((visit) => (
-              <VisitHistoryItem key={visit.id} visit={visit} />
-            ))}
-          </ul>
-        )}
-      </section>
     </>
   );
 }

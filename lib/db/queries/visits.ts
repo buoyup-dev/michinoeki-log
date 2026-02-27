@@ -73,8 +73,26 @@ export const getVisitStats = cache(async function getVisitStats(): Promise<Visit
   };
 });
 
+export const getVisitCount = cache(async function getVisitCount(): Promise<number> {
+  const user = await getUser();
+  if (!user) return 0;
+
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("visits")
+    .select("*", { count: "exact", head: true });
+
+  if (error) {
+    console.error("getVisitCount error:", error.message, error.code);
+    throw new Error("Failed to count visits");
+  }
+
+  return count ?? 0;
+});
+
 export const getVisitHistory = cache(async function getVisitHistory(
   limit = 20,
+  offset = 0,
 ): Promise<VisitWithStation[]> {
   const user = await getUser();
   if (!user) return [];
@@ -84,7 +102,8 @@ export const getVisitHistory = cache(async function getVisitHistory(
     .from("visits")
     .select("*, stations!inner(id, name, image_url, area_group)")
     .order("visited_at", { ascending: false })
-    .limit(limit);
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     console.error("getVisitHistory error:", error.message, error.code);
