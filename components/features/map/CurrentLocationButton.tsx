@@ -11,8 +11,11 @@ export function CurrentLocationButton({ onAutoLocateComplete }: CurrentLocationB
   const map = useMap();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSupported, setIsSupported] = useState(false);
 
-  const isSupported = typeof window !== "undefined" && "geolocation" in navigator;
+  useEffect(() => {
+    setIsSupported(window.isSecureContext && "geolocation" in navigator);
+  }, []);
 
   // 位置情報が許可済みなら初回マウント時に自動で現在地に移動
   useEffect(() => {
@@ -41,7 +44,11 @@ export function CurrentLocationButton({ onAutoLocateComplete }: CurrentLocationB
 
   function handleClick() {
     if (!isSupported) {
-      setErrorMessage("お使いのブラウザは位置情報に対応していません");
+      setErrorMessage(
+        window.isSecureContext
+          ? "お使いのブラウザは位置情報に対応していません"
+          : "位置情報の利用にはHTTPS接続が必要です"
+      );
       return;
     }
 
