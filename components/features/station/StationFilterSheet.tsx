@@ -2,7 +2,7 @@
 
 import {
   UtensilsCrossed, Baby, Zap, CarFront,
-  Thermometer, TreePine, Dog, Landmark,
+  Thermometer, TreePine, Dog, Landmark, X,
 } from "lucide-react";
 import {
   Sheet,
@@ -92,7 +92,7 @@ export function StationFilterSheet({
       <SheetContent
         side="bottom"
         showCloseButton={false}
-        className="max-h-[85vh] overflow-y-auto rounded-t-2xl"
+        className="flex max-h-[85vh] flex-col gap-0 rounded-t-2xl"
       >
         <SheetHeader className="flex-row items-center justify-between">
           <div>
@@ -102,14 +102,15 @@ export function StationFilterSheet({
             </SheetDescription>
           </div>
           <button
-            onClick={handleReset}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => onOpenChange(false)}
+            className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            aria-label="閉じる"
           >
-            リセット
+            <X className="size-5" />
           </button>
         </SheetHeader>
 
-        <div className="space-y-6 px-4 pb-6">
+        <div className="flex-1 space-y-6 overflow-y-auto px-4 py-2">
           {/* エリアフィルタ */}
           <section>
             <h3 className="mb-3 text-sm font-medium text-muted-foreground">
@@ -180,6 +181,24 @@ export function StationFilterSheet({
               ))}
             </div>
           </section>
+        </div>
+
+        {/* フッター */}
+        <div className="border-t border-border px-4 py-3">
+          <div className="mx-auto flex max-w-md gap-3">
+            <button
+              onClick={handleReset}
+              className="flex-1 rounded-lg border border-border py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+            >
+              リセット
+            </button>
+            <button
+              onClick={() => onOpenChange(false)}
+              className="flex-1 rounded-lg bg-primary py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              結果を見る
+            </button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>

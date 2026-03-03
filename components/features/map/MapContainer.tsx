@@ -53,6 +53,12 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
       <LeafletMapContainer
         center={[43.0, 143.0]}
         zoom={7}
+        minZoom={7}
+        maxBounds={[
+          [40.5, 138.0],  // 南西（余裕を持たせて函館方面もカバー）
+          [46.5, 147.5],  // 北東（余裕を持たせて根室方面もカバー）
+        ]}
+        maxBoundsViscosity={1.0}
         className="h-full w-full"
         zoomControl={true}
       >
