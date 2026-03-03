@@ -4,11 +4,16 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "北海道 道の駅コレクション",
-    template: "%s | 北海道 道の駅コレクション",
+    default: "みちコレ - 北海道 道の駅コレクション",
+    template: "%s | みちコレ - 北海道 道の駅コレクション",
   },
   description:
     "北海道の道の駅を地図で探して、訪問記録をスタンプラリー形式で残せるWebアプリ",
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
+  },
 };
 
 export default function RootLayout({
@@ -17,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -30,7 +35,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" suppressHydrationWarning>
         <Header />
         <main>{children}</main>
       </body>

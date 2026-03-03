@@ -31,6 +31,7 @@ type MapContainerProps = {
 export default function MapContainerComponent({ stations, visitBadges }: MapContainerProps) {
   const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMounted, setSheetMounted] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
   const isLoggedIn = visitBadges !== undefined;
@@ -41,7 +42,10 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
 
   const activeCount = useMemo(() => countActiveFilters(filters), [filters]);
 
-  const handleOpenSheet = useCallback(() => setSheetOpen(true), []);
+  const handleOpenSheet = useCallback(() => {
+    setSheetMounted(true);
+    setSheetOpen(true);
+  }, []);
   const handleAutoLocateComplete = useCallback(() => setMapReady(true), []);
 
   return (
@@ -49,6 +53,12 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
       <LeafletMapContainer
         center={[43.0, 143.0]}
         zoom={7}
+        minZoom={7}
+        maxBounds={[
+          [40.5, 138.0],  // 南西（余裕を持たせて函館方面もカバー）
+          [46.5, 147.5],  // 北東（余裕を持たせて根室方面もカバー）
+        ]}
+        maxBoundsViscosity={1.0}
         className="h-full w-full"
         zoomControl={true}
       >
@@ -63,13 +73,15 @@ export default function MapContainerComponent({ stations, visitBadges }: MapCont
         <div className="absolute inset-0 z-[1001] bg-background" />
       )}
       <MapFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
-      <StationFilterSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        filters={filters}
-        onFiltersChange={setFilters}
-        isLoggedIn={isLoggedIn}
-      />
+      {sheetMounted && (
+        <StationFilterSheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          filters={filters}
+          onFiltersChange={setFilters}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
     </div>
   );
 }

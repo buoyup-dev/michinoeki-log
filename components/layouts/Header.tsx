@@ -11,7 +11,7 @@ export async function Header() {
     <header className="sticky top-0 z-50 border-b border-border bg-card">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         <Link href="/" className="text-lg font-bold text-foreground">
-          道の駅コレクション
+          みちコレ
         </Link>
         <nav className="flex items-center gap-6">
           <Link

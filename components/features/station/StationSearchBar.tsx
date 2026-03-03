@@ -20,6 +20,7 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
   const deferredQuery = useDeferredValue(query);
   const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetMounted, setSheetMounted] = useState(false);
 
   const isLoggedIn = visitBadges !== undefined;
 
@@ -46,7 +47,10 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
     });
   }, [stations, deferredQuery, filters, visitBadges]);
 
-  const handleOpenSheet = useCallback(() => setSheetOpen(true), []);
+  const handleOpenSheet = useCallback(() => {
+    setSheetMounted(true);
+    setSheetOpen(true);
+  }, []);
 
   return (
     <div>
@@ -57,7 +61,7 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
           onChange={(e) => setQuery(e.target.value)}
           placeholder="道の駅名・住所で検索..."
           aria-label="道の駅を検索"
-          className="flex-1 rounded-lg border border-border px-4 py-2.5 text-sm placeholder-muted-foreground/70 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
+          className="min-w-0 flex-1 rounded-lg border border-border px-4 py-2.5 text-sm placeholder-muted-foreground/70 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
         />
         <StationFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
       </div>
@@ -65,13 +69,15 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
         {filtered.length}件の道の駅
       </p>
       <StationList stations={filtered} favoriteIds={favoriteIdsSet} visitBadges={visitBadges} />
-      <StationFilterSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        filters={filters}
-        onFiltersChange={setFilters}
-        isLoggedIn={isLoggedIn}
-      />
+      {sheetMounted && (
+        <StationFilterSheet
+          open={sheetOpen}
+          onOpenChange={setSheetOpen}
+          filters={filters}
+          onFiltersChange={setFilters}
+          isLoggedIn={isLoggedIn}
+        />
+      )}
     </div>
   );
 }
