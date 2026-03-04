@@ -3,8 +3,8 @@
 import { useState, useDeferredValue, useMemo, useCallback } from "react";
 import type { StationListItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
-import { createDefaultFilters, countActiveFilters, matchesStationFilters } from "@/types/station-filter";
-import type { StationFilters } from "@/types/station-filter";
+import { countActiveFilters, matchesStationFilters } from "@/types/station-filter";
+import { useFilterParams } from "@/hooks/useFilterParams";
 import { StationList } from "./StationList";
 import { StationFilterButton } from "./StationFilterButton";
 import { StationFilterSheet } from "./StationFilterSheet";
@@ -16,9 +16,8 @@ type StationSearchBarProps = {
 };
 
 export function StationSearchBar({ stations, favoriteIds, visitBadges }: StationSearchBarProps) {
-  const [query, setQuery] = useState("");
+  const { query, setQuery, filters, setFilters } = useFilterParams();
   const deferredQuery = useDeferredValue(query);
-  const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMounted, setSheetMounted] = useState(false);
 

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getStationsForList } from "@/lib/db/queries/stations";
 import { getUser } from "@/lib/supabase/auth";
@@ -23,11 +24,13 @@ export default async function StationsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold text-foreground">道の駅一覧</h1>
-      <StationSearchBar
-        stations={stations}
-        favoriteIds={favoriteIds}
-        visitBadges={visitBadges}
-      />
+      <Suspense>
+        <StationSearchBar
+          stations={stations}
+          favoriteIds={favoriteIds}
+          visitBadges={visitBadges}
+        />
+      </Suspense>
     </div>
   );
 }

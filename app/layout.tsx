@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Header } from "@/components/layouts/Header";
+import { NavigationTracker } from "@/components/NavigationTracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -36,6 +37,7 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased" suppressHydrationWarning>
+        <NavigationTracker />
         <Header />
         <main>{children}</main>
       </body>
