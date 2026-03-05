@@ -167,6 +167,24 @@ def parse_list_page(html: str) -> list[dict]:
     return stations
 
 
+def _extract_structured_text(td) -> str:
+    """<td>内のHTML構造を保持しつつテキストに変換する。
+
+    - <br> → 改行
+    - <strong> → そのままテキスト化（見出しとして機能）
+    - <a> → テキスト部分のみ保持
+    - 連続する空行は1つにまとめる
+    """
+    # <br> を改行文字に置換
+    for br in td.find_all("br"):
+        br.replace_with("\n")
+    text = td.get_text()
+    # 各行をstrip、空行を除去しつつ改行で結合
+    lines = [line.strip() for line in text.splitlines()]
+    lines = [line for line in lines if line]
+    return "\n".join(lines)
+
+
 def parse_detail_page(html: str, detail_url: str) -> dict:
     """個別ページから詳細データを抽出する。
 
@@ -240,9 +258,9 @@ def parse_detail_page(html: str, detail_url: str) -> dict:
             elif label == "TEL":
                 data["phone"] = value
             elif label in ("開館時間", "営業時間"):
-                data["business_hours"] = value
+                data["business_hours"] = _extract_structured_text(td)
             elif label in ("休館日", "定休日"):
-                data["closed_days"] = value
+                data["closed_days"] = _extract_structured_text(td)
 
     # === 施設アイコン (.sec_facility) ===
     facilities: dict[str, bool] = {k: False for k in ALL_FACILITY_KEYS}
@@ -285,7 +303,12 @@ def generate_insert(station: dict) -> str:
     def sql_str(val: Optional[str]) -> str:
         if val is None:
             return "NULL"
-        return f"'{escape_sql_string(val)}'"
+        escaped = escape_sql_string(val)
+        if "\n" in escaped:
+            # PostgreSQL E'...' 構文で改行をリテラル保持
+            escaped = escaped.replace("\n", "\\n")
+            return f"E'{escaped}'"
+        return f"'{escaped}'"
 
     facilities_json = json.dumps(facilities, ensure_ascii=False, sort_keys=True)
 

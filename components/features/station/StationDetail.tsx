@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Station } from "@/types/station";
 import { areaGroupColors } from "@/lib/utils/area-colors";
+import { BackButton } from "@/components/ui/BackButton";
 import { FacilityIcons } from "./FacilityIcons";
 
 type StationDetailProps = {
@@ -12,25 +12,7 @@ type StationDetailProps = {
 export function StationDetail({ station, actions }: StationDetailProps) {
   return (
     <div>
-      <Link
-        href="/stations"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <svg
-          className="h-4 w-4"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-        一覧に戻る
-      </Link>
+      <BackButton fallbackHref="/stations" label="戻る" />
 
       <div className="mt-4">
         {station.imageUrl ? (
@@ -118,7 +100,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="w-20 shrink-0 text-sm font-medium text-muted-foreground">
         {label}
       </span>
-      <span className="text-sm text-foreground">{value}</span>
+      <span className="whitespace-pre-line text-sm text-foreground">{value}</span>
     </div>
   );
 }
