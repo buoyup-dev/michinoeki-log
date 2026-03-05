@@ -100,7 +100,7 @@ function InfoRow({ label, value }: { label: string; value: string }) {
       <span className="w-20 shrink-0 text-sm font-medium text-muted-foreground">
         {label}
       </span>
-      <span className="text-sm text-foreground">{value}</span>
+      <span className="whitespace-pre-line text-sm text-foreground">{value}</span>
     </div>
   );
 }
