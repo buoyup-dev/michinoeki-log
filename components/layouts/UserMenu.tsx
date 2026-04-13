@@ -90,6 +90,14 @@ export function UserMenu({ displayName, avatarUrl }: UserMenuProps) {
           >
             訪問履歴
           </Link>
+          <Link
+            href="/mypage/pins"
+            role="menuitem"
+            className="block px-4 py-2 text-sm text-foreground hover:bg-muted focus-visible:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+            onClick={() => setIsOpen(false)}
+          >
+            ピン一覧
+          </Link>
           <form action={signOut}>
             <button
               type="submit"

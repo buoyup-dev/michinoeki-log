@@ -12,7 +12,7 @@ export function MapFilterButton({ activeCount, onClick }: MapFilterButtonProps) 
     <button
       onClick={onClick}
       aria-label={`絞り込み${activeCount > 0 ? `（${activeCount}件適用中）` : ""}`}
-      className="absolute right-3 top-3 z-[1000] flex items-center gap-1.5 rounded-lg bg-card/90 px-3 py-2 text-sm font-medium shadow-md backdrop-blur-sm transition-colors hover:bg-card"
+      className="flex items-center gap-1.5 rounded-lg bg-card/90 px-3 py-2 text-sm font-medium shadow-md backdrop-blur-sm transition-colors hover:bg-card"
     >
       <SlidersHorizontal className="size-4" />
       絞り込み
