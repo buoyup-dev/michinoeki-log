@@ -22,6 +22,27 @@ export function PinPhotoReplacer({ pinId, photo: initialPhoto }: PinPhotoReplace
   const [thumbnailUrl, setThumbnailUrl] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // アップロード済みだが未保存のURLを追跡（クリーンアップ用）
+  const uploadedRef = useRef({ photoUrl: "", thumbnailUrl: "" });
+
+  function cleanupStorage() {
+    const { photoUrl: pUrl, thumbnailUrl: tUrl } = uploadedRef.current;
+    if (!pUrl && !tUrl) return;
+    const supabase = createClient();
+    const paths = [pUrl, tUrl]
+      .map((url) => { const match = url.match(/\/map-pin-photos\/(.+)$/); return match ? match[1] : null; })
+      .filter((p): p is string => p !== null);
+    if (paths.length > 0) {
+      supabase.storage.from("map-pin-photos").remove(paths).catch((err) => console.error("Storage cleanup error:", err));
+    }
+    uploadedRef.current = { photoUrl: "", thumbnailUrl: "" };
+  }
+
+  // アンマウント時に未保存のアップロード済みファイルを削除
+  useEffect(() => {
+    return () => { cleanupStorage(); };
+  }, []);
+
   const [state, formAction, isPending] = useActionState(updateMapPinPhoto, null as ActionState);
 
   useEffect(() => {
@@ -36,12 +57,16 @@ export function PinPhotoReplacer({ pinId, photo: initialPhoto }: PinPhotoReplace
       );
       setPhotoUrl("");
       setThumbnailUrl("");
+      uploadedRef.current = { photoUrl: "", thumbnailUrl: "" }; // 保存済みのためクリア
     }
   }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // 再選択時: 前回アップロード済みの未保存ファイルを削除
+    cleanupStorage();
 
     const error = validateImageFile(file);
     if (error) {
@@ -81,6 +106,7 @@ export function PinPhotoReplacer({ pinId, photo: initialPhoto }: PinPhotoReplace
 
       setPhotoUrl(displayUrlData.publicUrl);
       setThumbnailUrl(thumbUrlData.publicUrl);
+      uploadedRef.current = { photoUrl: displayUrlData.publicUrl, thumbnailUrl: thumbUrlData.publicUrl };
     } catch (err) {
       console.error("Image upload error:", err);
       setImageError("画像のアップロードに失敗しました");
