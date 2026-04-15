@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import { MapContainer as LeafletMapContainer, TileLayer, ZoomControl, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { StationMapItem } from "@/types/station";
@@ -60,6 +60,19 @@ function PanForSidePanel({ pinId, pins, open }: { pinId: string | null; pins: Ma
   return null;
 }
 
+/**
+ * ピン作成モード時に地図コンテナのカーソルを crosshair に変更する
+ * Leaflet が .leaflet-grab で cursor: grab を設定するため、
+ * CSS クラスよりも優先度が高いインラインスタイルで上書きする
+ */
+function MapCursorControl({ active }: { active: boolean }) {
+  const map = useMap();
+  useEffect(() => {
+    map.getContainer().style.cursor = active ? "crosshair" : "";
+  }, [active, map]);
+  return null;
+}
+
 // Fix Leaflet default marker icon path broken by bundlers
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -100,10 +113,18 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
     setLocalPins(mapPins);
   }, [mapPins]);
 
+  // 初回マウントをスキップするためのフラグ
+  // 初回はSSRのpropsと同じデータのため二重取得を避ける
+  const isFirstMount = useRef(true);
+
   // マウント時: 別ページでの更新を反映するため最新データを取得
   // 初回はサーバーpropsと同じだが、/pins/[id]等から戻った場合は最新の画像URLが取れる
   // null=エラー（既存データ維持）、[]=0件（正常にクリア）
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
     fetchMapPins().then((fresh) => {
       if (fresh !== null) setLocalPins(fresh);
     });
@@ -180,6 +201,7 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <PinMarkers pins={localPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />
         <PanForSidePanel pinId={selectedPinId} pins={localPins} open={detailSheetOpen} />
+        <MapCursorControl active={pinCreateMode} />
         <CurrentLocationButton onAutoLocateComplete={handleAutoLocateComplete} />
         {pinCreateMode && (
           <PinCreationMode onLocationSelect={handleLocationSelect} />

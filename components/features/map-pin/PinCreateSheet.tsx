@@ -64,7 +64,26 @@ export function PinCreateSheet({
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
 
+  // アップロード済みだが未保存の画像をStorageから削除する（fire-and-forget）
+  function cleanupStorage() {
+    if (!photoUrl && !thumbnailUrl) return;
+    const supabase = createClient();
+    const paths = [photoUrl, thumbnailUrl]
+      .map((url) => {
+        if (!url) return null;
+        const match = url.match(/\/map-pin-photos\/(.+)$/);
+        return match ? match[1] : null;
+      })
+      .filter((p): p is string => p !== null);
+    if (paths.length > 0) {
+      supabase.storage.from("map-pin-photos").remove(paths).catch((err) => {
+        console.error("Storage cleanup error:", err);
+      });
+    }
+  }
+
   function handleClose() {
+    cleanupStorage();
     resetForm();
     onOpenChange(false);
   }
@@ -137,7 +156,10 @@ export function PinCreateSheet({
     <Sheet
       open={open}
       onOpenChange={(v) => {
-        if (!v) resetForm();
+        if (!v) {
+          cleanupStorage();
+          resetForm();
+        }
         onOpenChange(v);
       }}
       modal={!isDesktop ? true : false}
@@ -160,7 +182,8 @@ export function PinCreateSheet({
           </div>
           <button
             onClick={handleClose}
-            className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            disabled={uploading}
+            className="rounded-full p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors disabled:opacity-50"
             aria-label="閉じる"
           >
             <X className="size-5" />
@@ -272,7 +295,8 @@ export function PinCreateSheet({
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 rounded-lg border border-border py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted"
+                disabled={uploading}
+                className="flex-1 rounded-lg border border-border py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
               >
                 キャンセル
               </button>

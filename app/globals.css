@@ -78,9 +78,9 @@
   animation: pin-bounce 1.2s ease-in-out infinite;
 }
 
-/* Radix Dialog modal が body に pointer-events: none を設定するのを上書き */
-/* サイドパネル（非モーダル）展開時も地図のズーム・パン操作を可能にする */
-body {
+/* デスクトップサイドパネル（非モーダル）展開時のみ pointer-events を復元 */
+/* Radix Dialog は body[data-pin-panel-open] が付与されていない場合は通常通り動作する */
+body[data-pin-panel-open="true"] {
   pointer-events: auto !important;
 }
 

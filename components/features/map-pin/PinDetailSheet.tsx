@@ -43,7 +43,7 @@ export function PinDetailSheet({
       setPin((prev) => prev ? { ...prev, memo: editMemo.trim() || null } : prev);
       setEditing(false);
     }
-  }, [memoState]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [memoState, editMemo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [toggleState, toggleAction, isToggling] = useActionState<ActionState, FormData>(
     toggleMapPinVisibility,
@@ -51,10 +51,10 @@ export function PinDetailSheet({
   );
 
   useEffect(() => {
-    if (toggleState?.success && pin) {
+    if (toggleState?.success) {
       setPin((prev) => prev ? { ...prev, isPublic: !prev.isPublic } : prev);
     }
-  }, [toggleState]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [toggleState]);
 
   // シートが開くたびに最新データを再フェッチ（画像変更などの反映のため）
   useEffect(() => {
@@ -71,6 +71,20 @@ export function PinDetailSheet({
 
   const isOwn = userId != null && pin?.userId === userId;
   const isDesktop = useMediaQuery("(min-width: 640px)");
+
+  // PC サイドパネル（非モーダル）展開中のみ body に data 属性を付与し、
+  // pointer-events: auto !important を適用するCSSセレクタを有効にする。
+  // Radix AlertDialog 等が開いている間は属性が除去されるため、背面クリック抑止が正常動作する。
+  useEffect(() => {
+    if (isDesktop && open) {
+      document.body.dataset.pinPanelOpen = "true";
+    } else {
+      delete document.body.dataset.pinPanelOpen;
+    }
+    return () => {
+      delete document.body.dataset.pinPanelOpen;
+    };
+  }, [open, isDesktop]);
 
   // PC サイドパネル: 外部クリック検知（短押しのみ。ドラッグ操作では閉じない）
   const deleteDialogOpenRef = useRef(false);
