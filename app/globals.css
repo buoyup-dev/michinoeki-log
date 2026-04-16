@@ -66,6 +66,24 @@
   }
 }
 
+/* マップピンのバウンスアニメーション（選択時） */
+/* Leaflet マーカーは transform: translate3d で配置されるため、
+   マーカー要素自体ではなく内側の子要素にアニメーションを適用する */
+@keyframes pin-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.pin-bounce > * {
+  animation: pin-bounce 1.2s ease-in-out infinite;
+}
+
+/* デスクトップサイドパネル（非モーダル）展開時のみ pointer-events を復元 */
+/* Radix Dialog は body[data-pin-panel-open] が付与されていない場合は通常通り動作する */
+body[data-pin-panel-open="true"] {
+  pointer-events: auto !important;
+}
+
 /* iOS で input フォーカス時の自動ズームを防止（16px 未満で発生） */
 @media screen and (max-width: 767px) {
   input,

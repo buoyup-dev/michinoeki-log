@@ -70,6 +70,82 @@ export type Database = {
           },
         ]
       }
+      map_pin_photos: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string
+          pin_id: string
+          sort_order: number
+          thumbnail_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url: string
+          pin_id: string
+          sort_order?: number
+          thumbnail_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string
+          pin_id?: string
+          sort_order?: number
+          thumbnail_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_pin_photos_pin_id_fkey"
+            columns: ["pin_id"]
+            isOneToOne: false
+            referencedRelation: "map_pins"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_pins: {
+        Row: {
+          created_at: string
+          id: string
+          is_public: boolean
+          latitude: number
+          longitude: number
+          memo: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          latitude: number
+          longitude: number
+          memo?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          latitude?: number
+          longitude?: number
+          memo?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_pins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

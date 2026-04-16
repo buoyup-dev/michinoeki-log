@@ -115,10 +115,32 @@ erDiagram
         timestamptz updated_at
     }
 
+    %% マップピン機能
+    map_pins {
+        uuid id PK
+        uuid user_id FK
+        float8 latitude
+        float8 longitude
+        text memo
+        boolean is_public
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    map_pin_photos {
+        uuid id PK
+        uuid pin_id FK
+        text photo_url
+        text thumbnail_url
+        int4 sort_order
+        timestamptz created_at
+    }
+
     %% リレーション
     auth_users ||--|| profiles : "1:1"
     profiles ||--o{ visits : "has many"
     profiles ||--o{ favorites : "has many"
+    profiles ||--o{ map_pins : "has many"
     profiles ||--o{ station_reports : "has many"
     profiles ||--o{ station_tips : "has many"
     profiles ||--o{ routes : "has many"
@@ -129,6 +151,7 @@ erDiagram
     stations ||--o{ route_stations : "has many"
     visits ||--o{ visit_photos : "has many"
     routes ||--o{ route_stations : "has many"
+    map_pins ||--o{ map_pin_photos : "has many"
 ```
 
 ---
@@ -318,7 +341,55 @@ GROUP BY station_id;
 
 ---
 
-### 2.5 visit_photos（訪問写真）-- Phase 2
+### 2.5 map_pins（マップピン）
+
+ログインユーザーが地図上に置く写真+メモの記録。デフォルト公開で、投稿者が非公開に切り替え可能。
+
+| カラム名 | 型 | NULL | デフォルト | 説明 |
+|---------|-----|------|-----------|------|
+| id | uuid | NO | `gen_random_uuid()` | 主キー |
+| user_id | uuid | NO | | 投稿者ユーザーID |
+| latitude | float8 | NO | | 緯度（WGS84） |
+| longitude | float8 | NO | | 経度（WGS84） |
+| memo | text | YES | | 一言メモ（最大200文字、アプリ層バリデーション） |
+| is_public | boolean | NO | `true` | 公開フラグ（true=公開、false=非公開） |
+| created_at | timestamptz | NO | `now()` | 作成日時 |
+| updated_at | timestamptz | NO | `now()` | 更新日時 |
+
+**制約**:
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (user_id) REFERENCES profiles(id) ON DELETE CASCADE`
+- `CHECK (latitude BETWEEN 40.5 AND 46.5)` -- 北海道の地図表示範囲
+- `CHECK (longitude BETWEEN 138.0 AND 147.5)` -- 北海道の地図表示範囲
+
+---
+
+### 2.6 map_pin_photos（マップピン写真）
+
+マップピンに添付する写真。将来の複数枚対応用に別テーブルに分離（UIは一旦1枚のみ）。
+
+| カラム名 | 型 | NULL | デフォルト | 説明 |
+|---------|-----|------|-----------|------|
+| id | uuid | NO | `gen_random_uuid()` | 主キー |
+| pin_id | uuid | NO | | ピンID |
+| photo_url | text | NO | | 表示用画像URL（Supabase Storage） |
+| thumbnail_url | text | NO | | サムネイル画像URL |
+| sort_order | int4 | NO | `0` | 表示順（将来の複数枚対応用） |
+| created_at | timestamptz | NO | `now()` | 作成日時 |
+
+**制約**:
+- `PRIMARY KEY (id)`
+- `FOREIGN KEY (pin_id) REFERENCES map_pins(id) ON DELETE CASCADE`
+
+**Storage**:
+- バケット名: `map-pin-photos`（public）
+- パス構造: `{user_id}/{filename}`
+- 画像バリデーション: JPEG / PNG / WebP、最大5MB
+- リサイズ: 表示用（長辺1200px, 80%）、サムネイル用（長辺200px, 70%）
+
+---
+
+### 2.8 visit_photos（訪問写真）-- Phase 2
 
 訪問記録に添付する写真。1回の訪問につき最大3枚まで。
 
@@ -337,7 +408,7 @@ GROUP BY station_id;
 
 ---
 
-### 2.6 station_reports（情報修正リクエスト）-- Phase 2
+### 2.9 station_reports（情報修正リクエスト）-- Phase 2
 
 ユーザーからの道の駅情報修正リクエスト。管理者が承認/却下する。
 
@@ -363,7 +434,7 @@ GROUP BY station_id;
 
 ---
 
-### 2.7 routes（ルート計画）-- Phase 2
+### 2.10 routes（ルート計画）-- Phase 2
 
 ユーザーが作成するドライブルート計画。お気に入りリストから道の駅を選択して巡回ルートを組む。
 
@@ -381,7 +452,7 @@ GROUP BY station_id;
 
 ---
 
-### 2.8 route_stations（ルート内の道の駅）-- Phase 2
+### 2.11 route_stations（ルート内の道の駅）-- Phase 2
 
 ルート計画に含まれる道の駅と巡回順序。
 
@@ -401,7 +472,7 @@ GROUP BY station_id;
 
 ---
 
-### 2.9 station_tips（道の駅Tips）-- Phase 3
+### 2.12 station_tips（道の駅Tips）-- Phase 3
 
 スタンプラリー特化の構造化レビュー。カテゴリ別にTipsを投稿できる。
 
@@ -501,7 +572,31 @@ CREATE INDEX idx_visits_station_id ON visits (station_id);
 -- （複合インデックスの左端一致原則）
 ```
 
-### 3.4 visit_photos（Phase 2）
+### 3.4 map_pins
+
+| インデックス名 | カラム | 種類 | 想定クエリ |
+|---------------|--------|------|-----------|
+| `pk_map_pins` | id | PRIMARY | ピン詳細取得 |
+| `idx_map_pins_user_id` | user_id | BTREE | ユーザーのピン一覧 |
+| `idx_map_pins_is_public` | is_public | BTREE | 公開ピンのフィルタリング |
+
+```sql
+CREATE INDEX idx_map_pins_user_id ON map_pins (user_id);
+CREATE INDEX idx_map_pins_is_public ON map_pins (is_public);
+```
+
+### 3.5 map_pin_photos
+
+| インデックス名 | カラム | 種類 | 想定クエリ |
+|---------------|--------|------|-----------|
+| `pk_map_pin_photos` | id | PRIMARY | 写真詳細取得 |
+| `idx_map_pin_photos_pin_id` | pin_id | BTREE | ピンの写真取得 |
+
+```sql
+CREATE INDEX idx_map_pin_photos_pin_id ON map_pin_photos (pin_id);
+```
+
+### 3.6 visit_photos（Phase 2）
 
 | インデックス名 | カラム | 種類 | 想定クエリ |
 |---------------|--------|------|-----------|
@@ -512,7 +607,7 @@ CREATE INDEX idx_visits_station_id ON visits (station_id);
 CREATE INDEX idx_visit_photos_visit_id ON visit_photos (visit_id, sort_order);
 ```
 
-### 3.5 station_reports（Phase 2）
+### 3.7 station_reports（Phase 2）
 
 | インデックス名 | カラム | 種類 | 想定クエリ |
 |---------------|--------|------|-----------|
@@ -529,7 +624,7 @@ CREATE INDEX idx_station_reports_user_id ON station_reports (user_id);
 CREATE INDEX idx_station_reports_station_id ON station_reports (station_id);
 ```
 
-### 3.6 routes / route_stations（Phase 2）
+### 3.8 routes / route_stations（Phase 2）
 
 | インデックス名 | カラム | 種類 | 想定クエリ |
 |---------------|--------|------|-----------|
@@ -543,7 +638,7 @@ CREATE INDEX idx_routes_user_id ON routes (user_id);
 CREATE INDEX idx_route_stations_route_id ON route_stations (route_id, sort_order);
 ```
 
-### 3.7 station_tips（Phase 3）
+### 3.9 station_tips（Phase 3）
 
 | インデックス名 | カラム | 種類 | 想定クエリ |
 |---------------|--------|------|-----------|
@@ -570,6 +665,8 @@ ALTER TABLE stations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE map_pins ENABLE ROW LEVEL SECURITY;
+ALTER TABLE map_pin_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE visit_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE station_reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE routes ENABLE ROW LEVEL SECURITY;
@@ -1273,3 +1370,4 @@ ORDER BY v.visited_at DESC, v.created_at DESC;
 |------|--------|------|
 | 2026-02-09 | Claude Code | spec.md v3 ベースで作成 |
 | 2026-02-09 | Claude Code | 整合性修正: address検索インデックス、role更新制限必須化、ルート計画テーブル追加、facilities定義追加 |
+| 2026-04-09 | Claude Code | map_pins, map_pin_photos テーブル追加（マップピン機能: Issue #8） |

@@ -4,19 +4,21 @@ import Link from "next/link";
 import { getMyProfile } from "@/lib/db/queries/profiles";
 import { getVisitStats, getVisitCount } from "@/lib/db/queries/visits";
 import { getFavoriteCount } from "@/lib/db/queries/favorites";
+import { getMyMapPinCount } from "@/lib/db/queries/map-pins";
 import { VisitStatsCard } from "@/components/features/visit/VisitStatsCard";
-import { Settings, Heart, Clock, ChevronRight } from "lucide-react";
+import { Settings, Heart, Clock, MapPin, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "マイページ",
 };
 
 export default async function MypagePage() {
-  const [profile, stats, visitCount, favoriteCount] = await Promise.all([
+  const [profile, stats, visitCount, favoriteCount, pinCount] = await Promise.all([
     getMyProfile(),
     getVisitStats(),
     getVisitCount(),
     getFavoriteCount(),
+    getMyMapPinCount(),
   ]);
 
   if (!profile) {
@@ -102,6 +104,23 @@ export default async function MypagePage() {
             <div>
               <p className="font-medium text-foreground">訪問履歴</p>
               <p className="text-sm text-muted-foreground">{visitCount}件</p>
+            </div>
+          </div>
+          <ChevronRight className="h-5 w-5 text-muted-foreground/70" />
+        </Link>
+
+        {/* ピン */}
+        <Link
+          href="/mypage/pins"
+          className="flex items-center justify-between rounded-lg border border-border bg-card p-4 transition hover:bg-muted"
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+              <MapPin className="h-5 w-5 text-green-500" />
+            </span>
+            <div>
+              <p className="font-medium text-foreground">ピン</p>
+              <p className="text-sm text-muted-foreground">{pinCount}件</p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 text-muted-foreground/70" />

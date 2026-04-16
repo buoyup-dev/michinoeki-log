@@ -78,7 +78,7 @@ export function CurrentLocationButton({ onAutoLocateComplete }: CurrentLocationB
   }
 
   return (
-    <div className="absolute bottom-6 right-3 z-[1000]">
+    <div className="absolute bottom-[120px] right-[10px] z-[1000]">
       {errorMessage && (
         <div className="mb-2 rounded-lg bg-red-50 px-3 py-1.5 text-xs text-red-700 shadow-md">
           {errorMessage}
