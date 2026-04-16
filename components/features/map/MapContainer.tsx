@@ -68,7 +68,20 @@ function PanForSidePanel({ pinId, pins, open }: { pinId: string | null; pins: Ma
 function MapCursorControl({ active }: { active: boolean }) {
   const map = useMap();
   useEffect(() => {
-    map.getContainer().style.cursor = active ? "crosshair" : "";
+    const container = map.getContainer();
+    container.style.cursor = active ? "crosshair" : "";
+
+    if (!active) return;
+
+    const handleMouseDown = () => { container.style.cursor = "grabbing"; };
+    const handleMouseUp = () => { container.style.cursor = "crosshair"; };
+
+    map.on("mousedown", handleMouseDown);
+    map.on("mouseup", handleMouseUp);
+    return () => {
+      map.off("mousedown", handleMouseDown);
+      map.off("mouseup", handleMouseUp);
+    };
   }, [active, map]);
   return null;
 }
