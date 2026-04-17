@@ -159,13 +159,13 @@ export function PinDetailSheet({
               {pin.photo && (
                 <div className={
                   isDesktop
-                    ? "w-full overflow-hidden rounded-lg"
-                    : "w-full sm:w-[420px] sm:shrink-0 overflow-hidden rounded-lg"
+                    ? "aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted"
+                    : "aspect-[16/9] w-full sm:w-[420px] sm:shrink-0 overflow-hidden rounded-lg bg-muted"
                 }>
                   <img
                     src={pin.photo.photoUrl}
                     alt="ピンの写真"
-                    className="aspect-[16/9] w-full object-cover"
+                    className="w-full h-full object-contain"
                   />
                 </div>
               )}
@@ -193,11 +193,11 @@ export function PinDetailSheet({
                   ) : (
                     <div>
                       {pin.memo ? (
-                        <div className="min-h-[180px] rounded-lg border border-input bg-background px-3 py-2">
+                        <div className="min-h-[80px] sm:min-h-[180px] rounded-lg border border-input bg-background px-3 py-2">
                           <p className="whitespace-pre-wrap text-sm">{pin.memo}</p>
                         </div>
                       ) : isOwn ? (
-                        <div className="min-h-[180px] rounded-lg border border-input bg-background px-3 py-2">
+                        <div className="min-h-[80px] sm:min-h-[180px] rounded-lg border border-input bg-background px-3 py-2">
                           <p className="text-sm text-muted-foreground">メモなし</p>
                         </div>
                       ) : null}

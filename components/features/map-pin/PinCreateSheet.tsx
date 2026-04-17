@@ -221,12 +221,12 @@ export function PinCreateSheet({
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="relative w-full overflow-hidden rounded-lg"
+                    className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted"
                   >
                     <img
                       src={imagePreview}
                       alt="プレビュー"
-                      className="aspect-[16/9] w-full object-cover sm:aspect-[16/9]"
+                      className="w-full h-full object-contain"
                     />
                     {uploading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/40">
