@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react";
-import { MapContainer as LeafletMapContainer, TileLayer, ZoomControl, useMap } from "react-leaflet";
+import { MapContainer as LeafletMapContainer, TileLayer, ZoomControl, useMap, ImageOverlay } from "react-leaflet";
 import L from "leaflet";
 import type { StationMapItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
@@ -13,6 +13,7 @@ import { StationMarkers } from "./StationMarkers";
 import { MapFilterButton } from "./MapFilterButton";
 import { StationFilterSheet } from "@/components/features/station/StationFilterSheet";
 import { CurrentLocationButton } from "./CurrentLocationButton";
+import { DevModeSheet, type DevToggleItem } from "./DevModeSheet";
 import { PinMarkers } from "@/components/features/map-pin/PinMarkers";
 import { PinCreateFAB } from "@/components/features/map-pin/PinCreateFAB";
 import { PinCreationMode } from "@/components/features/map-pin/PinCreationMode";
@@ -24,6 +25,12 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import "leaflet/dist/leaflet.css";
 
 const SIDE_PANEL_WIDTH = 400;
+
+// 円山動物園の敷地に合わせて手動調整済み（PoC）
+const MARUYAMA_ZOO_BOUNDS: [[number, number], [number, number]] = [
+  [43.04591, 141.30359], // 南西端
+  [43.05209, 141.30877], // 北東端
+];
 
 /**
  * サイドパネル展開時に、選択ピンがパネルに隠れないよう地図をパンする
@@ -108,6 +115,21 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMounted, setSheetMounted] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+
+  // PoC: 開発モード（開発環境のみ）
+  const [overlayVisible, setOverlayVisible] = useState(false);
+  const [devModeSheetOpen, setDevModeSheetOpen] = useState(false);
+  const [devSheetMounted, setDevSheetMounted] = useState(false);
+  const devToggles = useMemo<DevToggleItem[]>(() => [
+    {
+      id: "illustMap",
+      label: "イラストマップ",
+      description: "円山動物園周辺にオーバーレイを表示（PoC）",
+      value: overlayVisible,
+      onChange: setOverlayVisible,
+    },
+  ], [overlayVisible]);
+  const devModeActiveCount = devToggles.filter((t) => t.value).length;
 
   // ピン作成モード
   const [pinCreateMode, setPinCreateMode] = useState(false);
@@ -211,6 +233,16 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        {/* PoC: イラストマップオーバーレイ（開発環境かつ ON時のみ読み込み） */}
+        {process.env.NODE_ENV === "development" && overlayVisible && (
+          <ImageOverlay
+            url="/images/maruyama-zoo.png"
+            bounds={MARUYAMA_ZOO_BOUNDS}
+            opacity={0.7}
+            errorOverlayUrl="/images/overlay-error.png"
+            alt="円山動物園イラストマップ"
+          />
+        )}
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <PinMarkers pins={localPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />
         <PanForSidePanel pinId={selectedPinId} pins={localPins} open={detailSheetOpen} />
@@ -224,11 +256,35 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
         <div className="absolute inset-0 z-[1001] bg-background" />
       )}
       <div className="absolute right-3 top-3 z-[1000] flex items-center gap-2">
+        {/* PoC: 開発モードボタン（開発環境のみ） */}
+        {process.env.NODE_ENV === "development" && (
+          <button
+            type="button"
+            onClick={() => { setDevSheetMounted(true); setDevModeSheetOpen(true); }}
+            aria-label={`開発モード${devModeActiveCount > 0 ? `（${devModeActiveCount}件ON）` : ""}`}
+            className="flex items-center gap-1.5 rounded-lg bg-card/90 px-3 py-2 text-sm font-medium shadow-md backdrop-blur-sm transition-colors hover:bg-card"
+          >
+            開発モード
+            {devModeActiveCount > 0 && (
+              <span className="flex size-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+                {devModeActiveCount}
+              </span>
+            )}
+          </button>
+        )}
         {isLoggedIn && (
           <PinCreateFAB active={pinCreateMode} onClick={handleTogglePinCreateMode} />
         )}
         <MapFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
       </div>
+      {process.env.NODE_ENV === "development" && devSheetMounted && (
+        <DevModeSheet
+          open={devModeSheetOpen}
+          onOpenChange={setDevModeSheetOpen}
+          toggles={devToggles}
+          onReset={() => devToggles.forEach((t) => t.onChange(false))}
+        />
+      )}
       {sheetMounted && (
         <StationFilterSheet
           open={sheetOpen}
