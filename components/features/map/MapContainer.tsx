@@ -116,7 +116,7 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
   const [sheetMounted, setSheetMounted] = useState(false);
   const [mapReady, setMapReady] = useState(false);
 
-  // PoC: 開発モード（開発環境のみ）
+  // PoC: 開発モード（環境変数で制御）
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [devModeSheetOpen, setDevModeSheetOpen] = useState(false);
   const [devSheetMounted, setDevSheetMounted] = useState(false);
@@ -233,8 +233,8 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {/* PoC: イラストマップオーバーレイ（開発環境かつ ON時のみ読み込み） */}
-        {process.env.NODE_ENV === "development" && overlayVisible && (
+        {/* PoC: イラストマップオーバーレイ（環境変数ONかつトグルON時のみ読み込み） */}
+        {process.env.NEXT_PUBLIC_ENABLE_DEV_MODE === "true" && overlayVisible && (
           <ImageOverlay
             url="/images/maruyama-zoo.png"
             bounds={MARUYAMA_ZOO_BOUNDS}
@@ -256,8 +256,8 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
         <div className="absolute inset-0 z-[1001] bg-background" />
       )}
       <div className="absolute right-3 top-3 z-[1000] flex items-center gap-2">
-        {/* PoC: 開発モードボタン（開発環境のみ） */}
-        {process.env.NODE_ENV === "development" && (
+        {/* PoC: 開発モードボタン（環境変数で制御） */}
+        {process.env.NEXT_PUBLIC_ENABLE_DEV_MODE === "true" && (
           <button
             type="button"
             onClick={() => { setDevSheetMounted(true); setDevModeSheetOpen(true); }}
@@ -277,7 +277,7 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
         )}
         <MapFilterButton activeCount={activeCount} onClick={handleOpenSheet} />
       </div>
-      {process.env.NODE_ENV === "development" && devSheetMounted && (
+      {process.env.NEXT_PUBLIC_ENABLE_DEV_MODE === "true" && devSheetMounted && (
         <DevModeSheet
           open={devModeSheetOpen}
           onOpenChange={setDevModeSheetOpen}
