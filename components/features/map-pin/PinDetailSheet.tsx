@@ -157,15 +157,13 @@ export function PinDetailSheet({
             }>
               {/* 写真 */}
               {pin.photo && (
-                <div className={
-                  isDesktop
-                    ? "aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted"
-                    : "aspect-[16/9] w-full sm:w-[420px] sm:shrink-0 overflow-hidden rounded-lg bg-muted"
-                }>
+                <div className={`aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted ${
+                  isDesktop ? "" : "sm:w-[420px] sm:shrink-0"
+                }`}>
                   <img
                     src={pin.photo.photoUrl}
                     alt="ピンの写真"
-                    className="w-full h-full object-contain"
+                    className="h-full w-full object-contain"
                   />
                 </div>
               )}

@@ -30,11 +30,11 @@ export default async function PinDetailPage(props: {
       {isOwn ? (
         <PinPhotoReplacer pinId={pin.id} photo={pin.photo} />
       ) : pin.photo ? (
-        <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-lg">
+        <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-lg bg-muted">
           <img
             src={pin.photo.photoUrl}
             alt="ピンの写真"
-            className="h-full w-full object-cover"
+            className="h-full w-full object-contain"
           />
         </div>
       ) : (
