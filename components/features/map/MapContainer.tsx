@@ -38,6 +38,10 @@ const JYOZANKEI_BOUNDS: [[number, number], [number, number]] = [
   [42.9589, 141.1494], // 南西端
   [42.9756, 141.1824], // 北東端
 ];
+const JYOZANKEI_LOW_URL = "/images/jyozankei-low.webp";
+const JYOZANKEI_HIGH_URL = "/images/jyozankei-high.webp";
+// zoom 14 以上で高画質に切り替える閾値（このズーム以上でイラストの細部が視認できる）
+const JYOZANKEI_HIGH_ZOOM_THRESHOLD = 14;
 
 /**
  * ズームレベルの変化を監視して通知する
@@ -51,6 +55,29 @@ function ZoomWatcher({ onZoomChange }: { onZoomChange: (zoom: number) => void })
     return () => { map.off("zoomend", handler); };
   }, [map, onZoomChange]);
   return null;
+}
+
+/**
+ * 定山渓イラストマップオーバーレイ
+ * zoom state を内部で管理することで、アンマウント時に自動リセットされる
+ */
+function JyozankeiOverlay() {
+  const [zoom, setZoom] = useState<number | null>(null);
+  return (
+    <>
+      {/* ZoomWatcher が zoom を確定させてから ImageOverlay をマウントすることで、
+          初回 URL 切り替えによる Leaflet の error イベント発火を防ぐ */}
+      <ZoomWatcher onZoomChange={setZoom} />
+      {zoom !== null && (
+        <ImageOverlay
+          url={zoom >= JYOZANKEI_HIGH_ZOOM_THRESHOLD ? JYOZANKEI_HIGH_URL : JYOZANKEI_LOW_URL}
+          bounds={JYOZANKEI_BOUNDS}
+          errorOverlayUrl="/images/overlay-error.png"
+          alt="定山渓イラストマップ"
+        />
+      )}
+    </>
+  );
 }
 
 /**
@@ -140,10 +167,6 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
   // PoC: 開発モード（環境変数で制御）
   const [overlayVisible, setOverlayVisible] = useState(false);
   const [jyozankeiVisible, setJyozankeiVisible] = useState(false);
-  const [zoom, setZoom] = useState<number | null>(null);
-  useEffect(() => {
-    if (!jyozankeiVisible) setZoom(null);
-  }, [jyozankeiVisible]);
   const [devModeSheetOpen, setDevModeSheetOpen] = useState(false);
   const [devSheetMounted, setDevSheetMounted] = useState(false);
   const devToggles = useMemo<DevToggleItem[]>(() => [
@@ -271,26 +294,12 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
           <ImageOverlay
             url="/images/maruyama-zoo.png"
             bounds={MARUYAMA_ZOO_BOUNDS}
-            opacity={0.7}
             errorOverlayUrl="/images/overlay-error.png"
             alt="円山動物園イラストマップ"
           />
         )}
-        {/* ZoomWatcher が zoom を確定させてから ImageOverlay をマウントすることで、
-            初回 URL 切り替えによる Leaflet の error イベント発火を防ぐ */}
         {process.env.NEXT_PUBLIC_ENABLE_DEV_MODE === "true" && jyozankeiVisible && (
-          <>
-            <ZoomWatcher onZoomChange={setZoom} />
-            {zoom !== null && (
-              <ImageOverlay
-                url={zoom >= 14 ? "/images/jyozankei-high.webp" : "/images/jyozankei-low.webp"}
-                bounds={JYOZANKEI_BOUNDS}
-                opacity={0.7}
-                errorOverlayUrl="/images/overlay-error.png"
-                alt="定山渓イラストマップ"
-              />
-            )}
-          </>
+          <JyozankeiOverlay />
         )}
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <PinMarkers pins={localPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />
