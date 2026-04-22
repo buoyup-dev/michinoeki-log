@@ -25,12 +25,60 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 import "leaflet/dist/leaflet.css";
 
 const SIDE_PANEL_WIDTH = 400;
+const INITIAL_ZOOM = 7;
 
 // 円山動物園の敷地に合わせて手動調整済み（PoC）
 const MARUYAMA_ZOO_BOUNDS: [[number, number], [number, number]] = [
   [43.04591, 141.30359], // 南西端
   [43.05209, 141.30877], // 北東端
 ];
+
+// 定山渓エリア（PoC・未調整）
+const JYOZANKEI_BOUNDS: [[number, number], [number, number]] = [
+  [42.9589, 141.1494], // 南西端
+  [42.9756, 141.1824], // 北東端
+];
+const JYOZANKEI_LOW_URL = "/images/jyozankei-low.webp";
+const JYOZANKEI_HIGH_URL = "/images/jyozankei-high.webp";
+// zoom 14 以上で高画質に切り替える閾値（このズーム以上でイラストの細部が視認できる）
+const JYOZANKEI_HIGH_ZOOM_THRESHOLD = 14;
+
+/**
+ * ズームレベルの変化を監視して通知する
+ */
+function ZoomWatcher({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
+  const map = useMap();
+  useEffect(() => {
+    onZoomChange(map.getZoom());
+    const handler = () => onZoomChange(map.getZoom());
+    map.on("zoomend", handler);
+    return () => { map.off("zoomend", handler); };
+  }, [map, onZoomChange]);
+  return null;
+}
+
+/**
+ * 定山渓イラストマップオーバーレイ
+ * zoom state を内部で管理することで、アンマウント時に自動リセットされる
+ */
+function JyozankeiOverlay() {
+  const [zoom, setZoom] = useState<number | null>(null);
+  return (
+    <>
+      {/* ZoomWatcher が zoom を確定させてから ImageOverlay をマウントすることで、
+          初回 URL 切り替えによる Leaflet の error イベント発火を防ぐ */}
+      <ZoomWatcher onZoomChange={setZoom} />
+      {zoom !== null && (
+        <ImageOverlay
+          url={zoom >= JYOZANKEI_HIGH_ZOOM_THRESHOLD ? JYOZANKEI_HIGH_URL : JYOZANKEI_LOW_URL}
+          bounds={JYOZANKEI_BOUNDS}
+          errorOverlayUrl="/images/overlay-error.png"
+          alt="定山渓イラストマップ"
+        />
+      )}
+    </>
+  );
+}
 
 /**
  * サイドパネル展開時に、選択ピンがパネルに隠れないよう地図をパンする
@@ -118,17 +166,25 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
 
   // PoC: 開発モード（環境変数で制御）
   const [overlayVisible, setOverlayVisible] = useState(false);
+  const [jyozankeiVisible, setJyozankeiVisible] = useState(false);
   const [devModeSheetOpen, setDevModeSheetOpen] = useState(false);
   const [devSheetMounted, setDevSheetMounted] = useState(false);
   const devToggles = useMemo<DevToggleItem[]>(() => [
     {
       id: "illustMap",
-      label: "イラストマップ",
+      label: "イラストマップ（円山動物園）",
       description: "円山動物園周辺にオーバーレイを表示（PoC）",
       value: overlayVisible,
       onChange: setOverlayVisible,
     },
-  ], [overlayVisible]);
+    {
+      id: "jyozankeiMap",
+      label: "イラストマップ（定山渓）",
+      description: "定山渓周辺にオーバーレイを表示（PoC）",
+      value: jyozankeiVisible,
+      onChange: setJyozankeiVisible,
+    },
+  ], [overlayVisible, jyozankeiVisible]);
   const devModeActiveCount = devToggles.filter((t) => t.value).length;
 
   // ピン作成モード
@@ -218,7 +274,7 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
     <div className="relative h-full w-full">
       <LeafletMapContainer
         center={[43.0, 143.0]}
-        zoom={7}
+        zoom={INITIAL_ZOOM}
         minZoom={7}
         maxBounds={[
           [41.1, 139.0],  // 南西（函館をカバー、青森を除外）
@@ -238,10 +294,12 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
           <ImageOverlay
             url="/images/maruyama-zoo.png"
             bounds={MARUYAMA_ZOO_BOUNDS}
-            opacity={0.7}
             errorOverlayUrl="/images/overlay-error.png"
             alt="円山動物園イラストマップ"
           />
+        )}
+        {process.env.NEXT_PUBLIC_ENABLE_DEV_MODE === "true" && jyozankeiVisible && (
+          <JyozankeiOverlay />
         )}
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <PinMarkers pins={localPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />

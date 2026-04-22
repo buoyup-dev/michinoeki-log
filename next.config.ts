@@ -28,6 +28,21 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        // /images/ フォルダの画像にキャッシュの有効期限を設定する
+        // これにより、2回目以降のアクセスはサーバーへの確認なしに手元のキャッシュを使うため高速化される
+        //
+        // PoC段階では画像ファイルを同じ名前のまま差し替える可能性があるため
+        // immutable にすると古い画像がブラウザに残り続けてしまう
+        // 本番リリース時はファイル名にバージョン番号を付けて immutable に切り替えることを推奨
+        source: "/images/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=3600",
+          },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           {
