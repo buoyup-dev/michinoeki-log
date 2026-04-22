@@ -28,7 +28,7 @@ function createPinIcon(thumbnailUrl: string, isOwn: boolean, size: number): L.Di
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w + bw * 2}" height="${h + bw * 2}" viewBox="${-pad} ${-pad} ${vbW} ${vbH}" overflow="visible">
     <path d="M20 52C20 52 40 30 40 18.5C40 8.3 31 0 20 0C9 0 0 8.3 0 18.5C0 30 20 52 20 52Z"
       fill="white" stroke="${borderColor}" stroke-width="${scaledBw}"/>
-    <foreignObject x="6" y="4" width="28" height="28">
+    <foreignObject x="3" y="2" width="34" height="34">
       <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border-radius:50%;overflow:hidden">
         <img src="${thumbnailUrl}" style="width:100%;height:100%;object-fit:cover" />
       </div>

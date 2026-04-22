@@ -134,16 +134,16 @@ export function PinPhotoReplacer({ pinId, photo: initialPhoto }: PinPhotoReplace
       <button
         type="button"
         onClick={() => fileInputRef.current?.click()}
-        className="group relative block w-full overflow-hidden rounded-lg"
+        className="group relative block aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted"
       >
         {displayUrl ? (
           <img
             src={displayUrl}
             alt="ピンの写真"
-            className="aspect-[16/9] w-full object-cover"
+            className="h-full w-full object-contain"
           />
         ) : (
-          <div className="flex aspect-[16/9] items-center justify-center bg-muted">
+          <div className="flex h-full w-full items-center justify-center">
             <div className="flex flex-col items-center gap-1 text-muted-foreground">
               <ImagePlus className="size-8" />
               <span className="text-sm">写真を選択</span>
