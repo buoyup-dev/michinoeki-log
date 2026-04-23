@@ -6,7 +6,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self'${isDev ? " 'unsafe-eval'" : ""} 'unsafe-inline';
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  img-src 'self' data: blob: https://tile.openstreetmap.org https://*.supabase.co https://upload.wikimedia.org${isDev ? " http://127.0.0.1:* http://localhost:*" : ""};
+  img-src 'self' data: blob: https://tile.openstreetmap.org https://*.supabase.co https://upload.wikimedia.org https://jozankei.jp https://lh3.googleusercontent.com${isDev ? " https://www.j-bussankan.co.jp https://imgfp.hotp.jp http://127.0.0.1:* http://localhost:*" : ""};
   connect-src 'self' https://*.supabase.co https://tile.openstreetmap.org${isDev ? " http://127.0.0.1:* http://localhost:*" : ""};
   font-src 'self' https://fonts.gstatic.com;
   frame-src 'none';

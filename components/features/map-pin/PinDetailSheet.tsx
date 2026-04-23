@@ -97,6 +97,8 @@ export function PinDetailSheet({
     if (!isDesktop || !open) return;
 
     const handleMouseDown = (e: MouseEvent) => {
+      // パネル内でのマウスダウンは記録しない（パネル内→外ドラッグで誤閉じしないよう）
+      if (panelRef.current?.contains(e.target as Node)) return;
       mouseDownTimeRef.current = Date.now();
       mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
     };

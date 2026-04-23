@@ -6,6 +6,7 @@ import L from "leaflet";
 import type { StationMapItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
 import type { MapPinMarker } from "@/types/map-pin";
+import type { SpotMarker } from "@/types/spot";
 import type { StationFilters } from "@/types/station-filter";
 import { createDefaultFilters, countActiveFilters, matchesStationFilters } from "@/types/station-filter";
 import { fetchMapPins } from "@/lib/actions/map-pin";
@@ -15,6 +16,8 @@ import { StationFilterSheet } from "@/components/features/station/StationFilterS
 import { CurrentLocationButton } from "./CurrentLocationButton";
 import { DevModeSheet, type DevToggleItem } from "./DevModeSheet";
 import { PinMarkers } from "@/components/features/map-pin/PinMarkers";
+import { SpotMarkers } from "@/components/features/spot/SpotMarkers";
+import { SpotDetailSheet } from "@/components/features/spot/SpotDetailSheet";
 import { PinCreateFAB } from "@/components/features/map-pin/PinCreateFAB";
 import { PinCreationMode } from "@/components/features/map-pin/PinCreationMode";
 import { PinCreateSheet } from "@/components/features/map-pin/PinCreateSheet";
@@ -154,11 +157,12 @@ type MapContainerProps = {
   stations: StationMapItem[];
   visitBadges?: StationVisitBadgeRecord;
   mapPins: MapPinMarker[];
+  spots: SpotMarker[];
   userId?: string;
   initialPinId?: string;
 };
 
-export default function MapContainerComponent({ stations, visitBadges, mapPins, userId, initialPinId }: MapContainerProps) {
+export default function MapContainerComponent({ stations, visitBadges, mapPins, spots, userId, initialPinId }: MapContainerProps) {
   const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMounted, setSheetMounted] = useState(false);
@@ -195,6 +199,10 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
   // ピン詳細表示
   const [selectedPinId, setSelectedPinId] = useState<string | null>(null);
   const [detailSheetOpen, setDetailSheetOpen] = useState(false);
+
+  // スポット詳細表示
+  const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null);
+  const [spotDetailSheetOpen, setSpotDetailSheetOpen] = useState(false);
 
   // ピンデータ（ローカル状態で保持し、作成/削除時にリロードで更新）
   const [localPins, setLocalPins] = useState(mapPins);
@@ -257,6 +265,15 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
   const handlePinClick = useCallback((pinId: string) => {
     setSelectedPinId(pinId);
     setDetailSheetOpen(true);
+    // スポット詳細が開いていれば閉じる
+    setSpotDetailSheetOpen(false);
+  }, []);
+
+  const handleSpotClick = useCallback((spotId: string) => {
+    setSelectedSpotId(spotId);
+    setSpotDetailSheetOpen(true);
+    // ピン詳細が開いていれば閉じる
+    setDetailSheetOpen(false);
   }, []);
 
   const handlePinCreated = useCallback((newPin: MapPinMarker) => {
@@ -302,6 +319,12 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
           <JyozankeiOverlay />
         )}
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
+        <SpotMarkers
+          spots={spots}
+          onSpotClick={handleSpotClick}
+          selectedSpotId={selectedSpotId}
+          spotDetailOpen={spotDetailSheetOpen}
+        />
         <PinMarkers pins={localPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />
         <PanForSidePanel pinId={selectedPinId} pins={localPins} open={detailSheetOpen} />
         <MapCursorControl active={pinCreateMode} />
@@ -370,6 +393,11 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
         pinId={selectedPinId}
         userId={userId}
         onDeleted={handlePinDeleted}
+      />
+      <SpotDetailSheet
+        open={spotDetailSheetOpen}
+        onOpenChange={setSpotDetailSheetOpen}
+        spotId={selectedSpotId}
       />
     </div>
   );

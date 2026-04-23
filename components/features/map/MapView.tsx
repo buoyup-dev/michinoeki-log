@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import type { StationMapItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
 import type { MapPinMarker } from "@/types/map-pin";
+import type { SpotMarker } from "@/types/spot";
 
 const MapContainer = dynamic(() => import("./MapContainer"), {
   ssr: false,
@@ -18,10 +19,11 @@ type MapViewProps = {
   stations: StationMapItem[];
   visitBadges?: StationVisitBadgeRecord;
   mapPins: MapPinMarker[];
+  spots: SpotMarker[];
   userId?: string;
   initialPinId?: string;
 };
 
-export function MapView({ stations, visitBadges, mapPins, userId, initialPinId }: MapViewProps) {
-  return <MapContainer stations={stations} visitBadges={visitBadges} mapPins={mapPins} userId={userId} initialPinId={initialPinId} />;
+export function MapView({ stations, visitBadges, mapPins, spots, userId, initialPinId }: MapViewProps) {
+  return <MapContainer stations={stations} visitBadges={visitBadges} mapPins={mapPins} spots={spots} userId={userId} initialPinId={initialPinId} />;
 }

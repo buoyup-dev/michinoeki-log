@@ -146,6 +146,92 @@ export type Database = {
           },
         ]
       }
+      spot_photos: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string
+          sort_order: number
+          spot_id: string
+          thumbnail_url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url: string
+          sort_order?: number
+          spot_id: string
+          thumbnail_url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string
+          sort_order?: number
+          spot_id?: string
+          thumbnail_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spot_photos_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "spots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spots: {
+        Row: {
+          address: string | null
+          category: 'souvenir' | 'restaurant' | 'park' | 'attraction' | 'accommodation' | 'other'
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          latitude: number
+          longitude: number
+          name: string
+          name_kana: string | null
+          phone: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          address?: string | null
+          category: 'souvenir' | 'restaurant' | 'park' | 'attraction' | 'accommodation' | 'other'
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          latitude: number
+          longitude: number
+          name: string
+          name_kana?: string | null
+          phone?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          address?: string | null
+          category?: 'souvenir' | 'restaurant' | 'park' | 'attraction' | 'accommodation' | 'other'
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          latitude?: number
+          longitude?: number
+          name?: string
+          name_kana?: string | null
+          phone?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

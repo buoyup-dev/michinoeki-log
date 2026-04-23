@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import { Marker, useMapEvents } from "react-leaflet";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Marker } from "react-leaflet";
 import L from "leaflet";
+import { usePinSize } from "@/hooks/usePinSize";
 import type { MapPinMarker } from "@/types/map-pin";
-
-/** ズームレベルに応じたピン幅（3段階） */
-function getPinSize(zoom: number): number {
-  if (zoom >= 13) return 48;  // 詳細
-  if (zoom >= 10) return 36;  // 中域
-  return 30;                   // 広域
-}
 
 /** しずく型SVGピンアイコン（foreignObjectで円形写真を埋め込み） */
 function createPinIcon(thumbnailUrl: string, isOwn: boolean, size: number): L.DivIcon {
@@ -55,22 +49,8 @@ type PinMarkersProps = {
 };
 
 export function PinMarkers({ pins, userId, selectedPinId, onPinClick }: PinMarkersProps) {
-  const [pinSize, setPinSize] = useState(36);
+  const pinSize = usePinSize();
   const markerRefs = useRef<Map<string, L.Marker>>(new Map());
-
-  const handleZoom = useCallback((map: L.Map) => {
-    const newSize = getPinSize(map.getZoom());
-    setPinSize((prev) => (prev !== newSize ? newSize : prev));
-  }, []);
-
-  useMapEvents({
-    zoomend(e) {
-      handleZoom(e.target);
-    },
-    load(e) {
-      handleZoom(e.target);
-    },
-  });
 
   // 選択ピンにバウンスアニメーションを適用
   // pinSize 変更時にアイコンが再生成されDOM要素が入れ替わるため、再適用が必要
