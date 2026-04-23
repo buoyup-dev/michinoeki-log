@@ -2,15 +2,17 @@ import { getStationsForMap } from "@/lib/db/queries/stations";
 import { getUser } from "@/lib/supabase/auth";
 import { getVisitedStationBadges } from "@/lib/db/queries/visits";
 import { getMapPinsForMap } from "@/lib/db/queries/map-pins";
+import { getSpotsForMap } from "@/lib/db/queries/spots";
 import { MapView } from "@/components/features/map/MapView";
 
 export default async function Home(props: {
   searchParams: Promise<{ pin?: string }>;
 }) {
-  const [stations, user, mapPins, searchParams] = await Promise.all([
+  const [stations, user, mapPins, spots, searchParams] = await Promise.all([
     getStationsForMap(),
     getUser(),
     getMapPinsForMap(),
+    getSpotsForMap(),
     props.searchParams,
   ]);
 
@@ -22,6 +24,7 @@ export default async function Home(props: {
         stations={stations}
         visitBadges={visitBadges}
         mapPins={mapPins}
+        spots={spots}
         userId={user?.id}
         initialPinId={searchParams.pin}
       />

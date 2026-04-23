@@ -1,16 +1,10 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import { Marker, useMapEvents } from "react-leaflet";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Marker } from "react-leaflet";
 import L from "leaflet";
+import { usePinSize } from "@/hooks/usePinSize";
 import type { MapPinMarker } from "@/types/map-pin";
-
-/** ズームレベルに応じたピン幅（3段階） */
-function getPinSize(zoom: number): number {
-  if (zoom >= 13) return 48;  // 詳細
-  if (zoom >= 10) return 36;  // 中域
-  return 30;                   // 広域
-}
 
 /** しずく型SVGピンアイコン（foreignObjectで円形写真を埋め込み） */
 function createPinIcon(thumbnailUrl: string, isOwn: boolean, size: number): L.DivIcon {
@@ -28,7 +22,7 @@ function createPinIcon(thumbnailUrl: string, isOwn: boolean, size: number): L.Di
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w + bw * 2}" height="${h + bw * 2}" viewBox="${-pad} ${-pad} ${vbW} ${vbH}" overflow="visible">
     <path d="M20 52C20 52 40 30 40 18.5C40 8.3 31 0 20 0C9 0 0 8.3 0 18.5C0 30 20 52 20 52Z"
       fill="white" stroke="${borderColor}" stroke-width="${scaledBw}"/>
-    <foreignObject x="6" y="4" width="28" height="28">
+    <foreignObject x="3" y="2" width="34" height="34">
       <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;border-radius:50%;overflow:hidden">
         <img src="${thumbnailUrl}" style="width:100%;height:100%;object-fit:cover" />
       </div>
@@ -55,22 +49,8 @@ type PinMarkersProps = {
 };
 
 export function PinMarkers({ pins, userId, selectedPinId, onPinClick }: PinMarkersProps) {
-  const [pinSize, setPinSize] = useState(36);
+  const pinSize = usePinSize();
   const markerRefs = useRef<Map<string, L.Marker>>(new Map());
-
-  const handleZoom = useCallback((map: L.Map) => {
-    const newSize = getPinSize(map.getZoom());
-    setPinSize((prev) => (prev !== newSize ? newSize : prev));
-  }, []);
-
-  useMapEvents({
-    zoomend(e) {
-      handleZoom(e.target);
-    },
-    load(e) {
-      handleZoom(e.target);
-    },
-  });
 
   // 選択ピンにバウンスアニメーションを適用
   // pinSize 変更時にアイコンが再生成されDOM要素が入れ替わるため、再適用が必要
