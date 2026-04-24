@@ -1,5 +1,5 @@
 import type { Tables } from "@/types/database";
-import type { Spot, SpotPhoto, SpotMarker, SpotDetail } from "@/types/spot";
+import type { Spot, SpotPhoto, SpotMarker, SpotDetail, SpotListItem } from "@/types/spot";
 
 export type SpotRow = Tables<"spots">;
 export type SpotPhotoRow = Tables<"spot_photos">;
@@ -58,4 +58,21 @@ export function toSpotMarker(row: SpotMarkerRow): SpotMarker {
  */
 export function toSpotDetail(row: SpotRow): SpotDetail {
   return toSpot(row);
+}
+
+/**
+ * 一覧表示用の軽量型。SpotRow から必要なフィールドだけ Pick することで
+ * DB 型が唯一の真実の源になる。
+ */
+export type SpotListRow = Pick<SpotRow, "id" | "name" | "name_kana" | "category" | "address" | "image_url">;
+
+export function toSpotListItem(row: SpotListRow): SpotListItem {
+  return {
+    id: row.id,
+    name: row.name,
+    nameKana: row.name_kana,
+    category: row.category,
+    address: row.address,
+    imageUrl: row.image_url,
+  };
 }
