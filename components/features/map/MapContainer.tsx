@@ -9,6 +9,8 @@ import type { MapPinMarker } from "@/types/map-pin";
 import type { SpotMarker } from "@/types/spot";
 import type { StationFilters } from "@/types/station-filter";
 import { createDefaultFilters, countActiveFilters, matchesStationFilters } from "@/types/station-filter";
+import type { MapLayerFilters } from "@/types/map-filter";
+import { createDefaultLayerFilters, countActiveLayerFilters } from "@/types/map-filter";
 import { fetchMapPins } from "@/lib/actions/map-pin";
 import { StationMarkers } from "./StationMarkers";
 import { MapFilterButton } from "./MapFilterButton";
@@ -38,11 +40,11 @@ const MARUYAMA_ZOO_BOUNDS: [[number, number], [number, number]] = [
 
 // 定山渓エリア（PoC・未調整）
 const JYOZANKEI_BOUNDS: [[number, number], [number, number]] = [
-  [42.9589, 141.1494], // 南西端
-  [42.9756, 141.1824], // 北東端
+  [42.9570, 141.1428], // 南西端
+  [42.9820, 141.1828], // 北東端
 ];
-const JYOZANKEI_LOW_URL = "/images/jyozankei-low.webp";
-const JYOZANKEI_HIGH_URL = "/images/jyozankei-high.webp";
+const JYOZANKEI_LOW_URL = "/images/jyozankei-v2-low.webp";
+const JYOZANKEI_HIGH_URL = "/images/jyozankei-v2-high.webp";
 // zoom 14 以上で高画質に切り替える閾値（このズーム以上でイラストの細部が視認できる）
 const JYOZANKEI_HIGH_ZOOM_THRESHOLD = 14;
 
@@ -164,6 +166,7 @@ type MapContainerProps = {
 
 export default function MapContainerComponent({ stations, visitBadges, mapPins, spots, userId, initialPinId }: MapContainerProps) {
   const [filters, setFilters] = useState<StationFilters>(createDefaultFilters);
+  const [layerFilters, setLayerFilters] = useState<MapLayerFilters>(createDefaultLayerFilters);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMounted, setSheetMounted] = useState(false);
   const [mapReady, setMapReady] = useState(false);
@@ -224,9 +227,11 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
       isFirstMount.current = false;
       return;
     }
+    let cancelled = false;
     fetchMapPins().then((fresh) => {
-      if (fresh !== null) setLocalPins(fresh);
+      if (!cancelled && fresh !== null) setLocalPins(fresh);
     });
+    return () => { cancelled = true; };
   }, []);
 
   // URLクエリパラメータ ?pin=<id> でピン詳細を自動表示
@@ -243,7 +248,20 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
     return stations.filter((s) => matchesStationFilters(s, filters, visitBadges));
   }, [stations, filters, visitBadges]);
 
-  const activeCount = useMemo(() => countActiveFilters(filters), [filters]);
+  const filteredSpots = useMemo(() => {
+    if (layerFilters.spotCategories.size === 0) return [];
+    return spots.filter((s) => layerFilters.spotCategories.has(s.category));
+  }, [spots, layerFilters.spotCategories]);
+
+  const filteredPins = useMemo(() => {
+    if (layerFilters.pinFilter === "mine") return localPins.filter((p) => p.userId === userId);
+    return localPins;
+  }, [localPins, layerFilters.pinFilter, userId]);
+
+  const activeCount = useMemo(
+    () => countActiveFilters(filters) + countActiveLayerFilters(layerFilters),
+    [filters, layerFilters]
+  );
 
   const handleOpenSheet = useCallback(() => {
     setSheetMounted(true);
@@ -320,12 +338,12 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
         )}
         <StationMarkers stations={filteredStations} visitBadges={visitBadges} />
         <SpotMarkers
-          spots={spots}
+          spots={filteredSpots}
           onSpotClick={handleSpotClick}
           selectedSpotId={selectedSpotId}
           spotDetailOpen={spotDetailSheetOpen}
         />
-        <PinMarkers pins={localPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />
+        <PinMarkers pins={filteredPins} userId={userId} selectedPinId={detailSheetOpen ? selectedPinId : null} onPinClick={handlePinClick} />
         <PanForSidePanel pinId={selectedPinId} pins={localPins} open={detailSheetOpen} />
         <MapCursorControl active={pinCreateMode} />
         <CurrentLocationButton onAutoLocateComplete={handleAutoLocateComplete} />
@@ -373,6 +391,8 @@ export default function MapContainerComponent({ stations, visitBadges, mapPins, 
           filters={filters}
           onFiltersChange={setFilters}
           isLoggedIn={isLoggedIn}
+          layerFilters={layerFilters}
+          onLayerFiltersChange={setLayerFilters}
         />
       )}
       {selectedLocation && (
