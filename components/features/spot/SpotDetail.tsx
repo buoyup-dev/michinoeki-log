@@ -8,7 +8,7 @@ type SpotDetailProps = {
   spot: SpotDetail;
 };
 
-export function SpotDetail({ spot }: SpotDetailProps) {
+export function SpotDetailView({ spot }: SpotDetailProps) {
   const config = SPOT_CATEGORY_CONFIG[spot.category];
 
   return (

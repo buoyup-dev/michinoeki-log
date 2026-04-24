@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getSpotDetail, getAllSpotIds } from "@/lib/db/queries/spots";
-import { SpotDetail } from "@/components/features/spot/SpotDetail";
+import { SpotDetailView } from "@/components/features/spot/SpotDetail";
 
 export async function generateStaticParams() {
   const ids = await getAllSpotIds();
@@ -36,7 +36,7 @@ export default async function SpotDetailPage(props: {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
-      <SpotDetail spot={spot} />
+      <SpotDetailView spot={spot} />
     </div>
   );
 }
