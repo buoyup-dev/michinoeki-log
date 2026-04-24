@@ -27,14 +27,14 @@ export function createDefaultLayerFilters(): MapLayerFilters {
 }
 
 /**
- * 非選択のスポットカテゴリ数をカウント（全選択=デフォルト=0）。
- * station-filter.ts の countActiveFilters（選択した施設数）と同じ粒度で集計し、
- * MapContainer でのバッジ数値の加算時に意味が統一される。
+ * スポットカテゴリは「絞り込みがあるかどうか」を1件としてカウント（個数ではない）。
+ * 1つでも外せばバッジに+1、何個外しても+1のまま。
+ * ピンフィルタは "all" 以外なら+1。
  */
 export function countActiveLayerFilters(filters: MapLayerFilters): number {
   let count = 0;
-  // 非選択のカテゴリ数をカウント（全選択=デフォルト=0）
-  count += SPOT_CATEGORIES.length - filters.spotCategories.size;
+  // 1件でも絞り込みがあれば1（全選択=デフォルト=0）
+  if (filters.spotCategories.size < SPOT_CATEGORIES.length) count += 1;
   // "all" 以外なら1件
   if (filters.pinFilter !== "all") count += 1;
   return count;
