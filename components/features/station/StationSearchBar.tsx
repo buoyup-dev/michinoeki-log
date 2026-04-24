@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useDeferredValue, useMemo, useCallback } from "react";
+import { useState, useEffect, useRef, useDeferredValue, useMemo, useCallback } from "react";
 import type { StationListItem } from "@/types/station";
 import type { StationVisitBadgeRecord } from "@/types/badge";
 import { countActiveFilters, matchesStationFilters } from "@/types/station-filter";
@@ -17,9 +17,18 @@ type StationSearchBarProps = {
 
 export function StationSearchBar({ stations, favoriteIds, visitBadges }: StationSearchBarProps) {
   const { query, setQuery, filters, setFilters } = useFilterParams();
+  const [inputValue, setInputValue] = useState(query);
+  const isComposingRef = useRef(false);
   const deferredQuery = useDeferredValue(query);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [sheetMounted, setSheetMounted] = useState(false);
+
+  // ブラウザの戻る・進むでURLが変わったときにinputを同期する
+  useEffect(() => {
+    if (!isComposingRef.current) {
+      setInputValue(query);
+    }
+  }, [query]);
 
   const isLoggedIn = visitBadges !== undefined;
 
@@ -56,8 +65,17 @@ export function StationSearchBar({ stations, favoriteIds, visitBadges }: Station
       <div className="mb-6 flex gap-2">
         <input
           type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          value={inputValue}
+          onChange={(e) => {
+            setInputValue(e.target.value);
+            // IME変換中はURLを更新しない（日本語入力が崩れるのを防ぐ）
+            if (!isComposingRef.current) setQuery(e.target.value);
+          }}
+          onCompositionStart={() => { isComposingRef.current = true; }}
+          onCompositionEnd={(e) => {
+            isComposingRef.current = false;
+            setQuery(e.currentTarget.value);
+          }}
           placeholder="道の駅名・住所で検索..."
           aria-label="道の駅を検索"
           className="min-w-0 flex-1 rounded-lg border border-border px-4 py-2.5 text-sm placeholder-muted-foreground/70 focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"

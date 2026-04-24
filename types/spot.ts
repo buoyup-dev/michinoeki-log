@@ -55,3 +55,9 @@ export type SpotMarker = {
  * 代表画像は Spot.imageUrl を使用する。
  */
 export type SpotDetail = Spot;
+
+/** 一覧表示用の軽量なスポットデータ */
+export type SpotListItem = Pick<
+  Spot,
+  "id" | "name" | "nameKana" | "category" | "address" | "imageUrl"
+>;

@@ -5,6 +5,7 @@ import { getUser } from "@/lib/supabase/auth";
 import { getFavoriteStationIds } from "@/lib/db/queries/favorites";
 import { getVisitedStationBadges } from "@/lib/db/queries/visits";
 import { StationSearchBar } from "@/components/features/station/StationSearchBar";
+import { ListTabNav } from "@/components/ui/ListTabNav";
 
 export const metadata: Metadata = {
   title: "道の駅一覧",
@@ -23,6 +24,7 @@ export default async function StationsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      <ListTabNav activeHref="/stations" />
       <h1 className="mb-6 text-2xl font-bold text-foreground">道の駅一覧</h1>
       <Suspense>
         <StationSearchBar
