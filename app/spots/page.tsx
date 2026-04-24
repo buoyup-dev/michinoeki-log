@@ -16,7 +16,7 @@ export default async function SpotsPage() {
     <div className="mx-auto max-w-7xl px-4 py-8">
       <ListTabNav activeHref="/spots" />
       <h1 className="mb-6 text-2xl font-bold text-foreground">スポット一覧</h1>
-      <Suspense>
+      <Suspense fallback={null}>
         <SpotSearchBar spots={spots} />
       </Suspense>
     </div>

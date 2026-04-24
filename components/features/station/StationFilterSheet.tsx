@@ -20,6 +20,10 @@ import type {
 } from "@/types/station-filter";
 import { FACILITY_FILTER_OPTIONS, createDefaultFilters } from "@/types/station-filter";
 import { areaStyles } from "@/lib/utils/area-colors";
+import type { MapLayerFilters, PinFilter } from "@/types/map-filter";
+import { SPOT_CATEGORIES, PIN_FILTER_OPTIONS, createDefaultLayerFilters } from "@/types/map-filter";
+import type { SpotCategory } from "@/types/spot";
+import { SPOT_CATEGORY_CONFIG } from "@/lib/constants/spot-category";
 
 type StationFilterSheetProps = {
   open: boolean;
@@ -27,6 +31,8 @@ type StationFilterSheetProps = {
   filters: StationFilters;
   onFiltersChange: (filters: StationFilters) => void;
   isLoggedIn: boolean;
+  layerFilters?: MapLayerFilters;
+  onLayerFiltersChange?: (filters: MapLayerFilters) => void;
 };
 
 const AREA_FILTER_ITEMS = AREA_GROUPS.map((key) => ({
@@ -58,6 +64,8 @@ export function StationFilterSheet({
   filters,
   onFiltersChange,
   isLoggedIn,
+  layerFilters,
+  onLayerFiltersChange,
 }: StationFilterSheetProps) {
   function handleAreaToggle(area: AreaGroup) {
     const next = new Set(filters.areas);
@@ -85,6 +93,24 @@ export function StationFilterSheet({
 
   function handleReset() {
     onFiltersChange(createDefaultFilters());
+    onLayerFiltersChange?.(createDefaultLayerFilters());
+  }
+
+  function handleSpotCategoryToggle(cat: SpotCategory) {
+    if (!layerFilters) return;
+    const next = new Set(layerFilters.spotCategories);
+    if (next.has(cat)) {
+      if (next.size === 1) return; // 最後の1件は外せない（エリアフィルタと同じ挙動）
+      next.delete(cat);
+    } else {
+      next.add(cat);
+    }
+    onLayerFiltersChange?.({ ...layerFilters, spotCategories: next });
+  }
+
+  function handlePinFilterChange(key: PinFilter) {
+    if (!layerFilters) return;
+    onLayerFiltersChange?.({ ...layerFilters, pinFilter: key });
   }
 
   return (
@@ -181,6 +207,69 @@ export function StationFilterSheet({
               ))}
             </div>
           </section>
+
+          {/* 区切り線（地図ページのみ表示） */}
+          {layerFilters && onLayerFiltersChange && (
+            <hr className="border-dashed border-border" />
+          )}
+
+          {/* スポットカテゴリフィルタ（地図ページのみ表示） */}
+          {layerFilters && onLayerFiltersChange && (
+            <section>
+              <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+                スポット
+              </h3>
+              <div className="flex flex-wrap gap-2" role="group" aria-label="スポットカテゴリフィルタ">
+                {SPOT_CATEGORIES.map((cat) => {
+                  const config = SPOT_CATEGORY_CONFIG[cat];
+                  const isActive = layerFilters.spotCategories.has(cat);
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => handleSpotCategoryToggle(cat)}
+                      aria-pressed={isActive}
+                      className="rounded-full border px-4 py-1.5 text-sm font-medium transition-colors"
+                      style={
+                        isActive
+                          ? { backgroundColor: config.color, borderColor: config.color, color: "#ffffff" }
+                          : { borderColor: config.color, color: config.color, backgroundColor: "hsl(var(--card))" }
+                      }
+                    >
+                      {config.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* マップピンフィルタ（地図ページ・ログイン時のみ表示） */}
+          {layerFilters && onLayerFiltersChange && isLoggedIn && (
+            <section>
+              <h3 className="mb-3 text-sm font-medium text-muted-foreground">
+                マップピン
+              </h3>
+              <div className="flex gap-2" role="radiogroup" aria-label="マップピンフィルタ">
+                {PIN_FILTER_OPTIONS.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="radio"
+                    aria-checked={layerFilters.pinFilter === key}
+                    onClick={() => handlePinFilterChange(key)}
+                    className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                      layerFilters.pinFilter === key
+                        ? "border-[#45496a] bg-[#45496a] text-white"
+                        : "border-border bg-card text-foreground hover:border-border"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
 
         {/* フッター */}

@@ -1,21 +1,13 @@
 "use client";
 
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import type { SpotCategory } from "@/types/spot";
-
-const VALID_CATEGORIES = new Set<string>([
-  "souvenir",
-  "restaurant",
-  "park",
-  "attraction",
-  "accommodation",
-  "other",
-]);
+import { SPOT_CATEGORIES } from "@/types/map-filter";
 
 function parseCategory(raw: string | null): SpotCategory | "all" {
-  if (raw && VALID_CATEGORIES.has(raw)) return raw as SpotCategory;
-  return "all";
+  const found = SPOT_CATEGORIES.find((c) => c === raw);
+  return found ?? "all";
 }
 
 export function useSpotFilterParams() {
@@ -24,7 +16,10 @@ export function useSpotFilterParams() {
   const pathname = usePathname();
 
   const query = searchParams.get("q") ?? "";
-  const category = parseCategory(searchParams.get("category"));
+  const category = useMemo(
+    () => parseCategory(searchParams.get("category")),
+    [searchParams],
+  );
 
   const updateURL = useCallback(
     (newQuery: string, newCategory: SpotCategory | "all") => {
