@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { X, MapPin, Phone, Globe } from "lucide-react";
@@ -119,17 +120,20 @@ export function SpotDetailSheet({ open, onOpenChange, spotId }: SpotDetailSheetP
           <div className="flex flex-col gap-4">
             {/* 写真 */}
             {spot.imageUrl ? (
-              <div className="aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted">
-                <img
+              <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted">
+                <Image
                   src={spot.imageUrl}
                   alt={spot.name}
-                  className="h-full w-full object-cover"
-                  referrerPolicy="no-referrer"
+                  fill
+                  className="object-cover"
+                  sizes="400px"
+                  unoptimized
                 />
               </div>
             ) : (
               <div className="flex aspect-[16/9] items-center justify-center rounded-lg bg-muted">
                 <svg
+                  aria-hidden="true"
                   className="h-12 w-12 text-muted-foreground/50"
                   fill="none"
                   viewBox="0 0 24 24"

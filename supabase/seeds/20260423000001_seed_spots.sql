@@ -19,7 +19,7 @@ VALUES
     '北海道札幌市南区定山渓温泉東3丁目',
     '011-598-2178',
     'https://www.j-bussankan.co.jp/',
-    'https://www.j-bussankan.co.jp/wp-content/uploads/top_slide002.jpg',
+    NULL,
     true
   ),
 
@@ -34,7 +34,7 @@ VALUES
     '北海道札幌市南区定山渓温泉西3丁目',
     '011-598-2421',
     NULL,
-    'https://imgfp.hotp.jp/IMGH/51/09/P019865109/P019865109_480.jpg',
+    NULL,
     true
   ),
 
@@ -49,7 +49,7 @@ VALUES
     '北海道札幌市南区定山渓温泉西4丁目',
     NULL,
     NULL,
-    'https://lh3.googleusercontent.com/gps-cs-s/APNQkAGZeO-Tg_Gn2iWaf5mOWjIJhxZxr9pcv84NzgETGeGlTrpu3HFcQR88BLhTxI4jxUUMC3tZo93dggXi_kcGckv_JzL2IvLNsEjtzp_-7QQIxu0Um_s8zEuFkbnAeMuIUHmrygasvg=w408-h306-k-no',
+    NULL,
     true
   ),
 
@@ -64,7 +64,7 @@ VALUES
     '北海道札幌市南区定山渓温泉西4丁目',
     NULL,
     NULL,
-    'https://lh3.googleusercontent.com/gps-cs-s/APNQkAGFsvCrtFGBzXBEDuBMFNr7yqbRXtbiUP3EQS-oRb1lWnzKv_8AjViuBxC6cfwpUFopbraUwQAoP1dgD0wLfusH4zIHHts74tkLyW0rt1aSvwl95B9QPXN7YsuwdRBbRfzpdxFUOw=w408-h306-k-no',
+    NULL,
     true
   ),
 
@@ -79,7 +79,7 @@ VALUES
     '北海道札幌市南区定山渓温泉東2丁目',
     '011-598-3223',
     'https://www.jozankeiview.com/',
-    'https://lh3.googleusercontent.com/p/AF1QipMFkXLBXy2miGqeR3NemfHZRi2Wl7ZHe4Kss9Uw=s1360-w1360-h1020-rw',
+    NULL,
     true
   ),
 
@@ -94,6 +94,6 @@ VALUES
     '北海道札幌市南区定山渓温泉西3丁目',
     '011-598-2012',
     NULL,
-    'https://lh3.googleusercontent.com/gps-cs-s/APNQkAEI92BH86w3ujfZ2l_tbHpLcvbZnfMOoJURpH5gX55BmUxCQ5xQ6fLlsY0a-J9mYCfbXjU5xnSSWkmdJL1QdwhFX1RZmQa-W5kgndDGzrmK0zp8xGigw9mcBZMi8cLGpC0sU1xzCLC9XXVl=w408-h544-k-no',
+    NULL,
     true
   );
