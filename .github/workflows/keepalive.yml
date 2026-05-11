@@ -1,0 +1,24 @@
+name: Supabase Keepalive
+
+# Supabase 無料プランは一定期間アクセスがないと一時停止するため、
+# 毎日 /api/keepalive を叩いて DB へ到達させ、停止を防ぐ。
+on:
+  schedule:
+    # 毎日 UTC 15:00（JST 0:00）に実行
+    - cron: "0 15 * * *"
+  # 手動実行も可能
+  workflow_dispatch:
+
+permissions: {} # 権限を何も与えない
+
+jobs:
+  healthcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping /api/keepalive endpoint
+        run: |
+          curl --fail --show-error --silent \
+            --max-time 60 \
+            --retry 3 --retry-delay 15 --retry-all-errors \
+            -u "${{ secrets.BASIC_AUTH_USER }}:${{ secrets.BASIC_AUTH_PASSWORD }}" \
+            https://michinoeki-log.vercel.app/api/keepalive
