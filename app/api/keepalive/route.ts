@@ -2,8 +2,13 @@ import { NextResponse } from "next/server";
 import { createStaticClient } from "@/lib/supabase/static";
 
 // Supabase 無料プランは一定期間アクセスがないとプロジェクトが一時停止するため、
-// GitHub Actions から定期的にこのエンドポイントを叩き、DB へ到達させ続けて停止を防ぐ。
-// （middleware の Basic 認証配下に置くことで外部からの無差別アクセスを防ぐ）
+// Vercel Cron Jobs（vercel.json の crons）から毎日このエンドポイントを叩き、
+// DB へ到達させ続けて停止を防ぐ。
+// アクセス制御は middleware で行う:
+//   - Vercel Cron からの呼び出しは `Authorization: Bearer <CRON_SECRET>` で通す
+//   - それ以外は Basic 認証配下（外部からの無差別アクセスを防ぐ）
+// ※ GitHub Actions のスケジュール実行はリポジトリに 60 日間活動がないと
+//    自動停止されるため、リポジトリの活動に依存しない Vercel Cron を使う。
 export const dynamic = "force-dynamic";
 
 const NO_STORE = { "Cache-Control": "no-store" };
