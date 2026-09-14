@@ -107,20 +107,31 @@ describe("middleware", () => {
   describe("Supabase 応答不能時", () => {
     const auth = { authorization: basicHeader("user", "pass") };
 
-    it("getUser() が失敗しても公開ページは表示できる", async () => {
-      getUserMock.mockRejectedValue(
-        new DOMException("timeout", "TimeoutError"),
-      );
+    // auth-js はネットワークエラーを throw せず { data: { user: null }, error } で返す
+    const retryableError = Object.assign(new Error("fetch failed"), {
+      name: "AuthRetryableFetchError",
+    });
+
+    it("getUser() がエラーを返しても公開ページは表示でき、ログに残す", async () => {
+      getUserMock.mockResolvedValue({
+        data: { user: null },
+        error: retryableError,
+      });
 
       const res = await middleware(makeRequest("/stations", auth));
 
       expect(res.status).toBe(200);
+      expect(console.error).toHaveBeenCalledWith(
+        expect.stringContaining("getUser() failed"),
+        retryableError,
+      );
     });
 
-    it("getUser() が失敗した場合、保護ルートはログインへリダイレクトする", async () => {
-      getUserMock.mockRejectedValue(
-        new DOMException("timeout", "TimeoutError"),
-      );
+    it("getUser() がエラーを返した場合、保護ルートはログインへリダイレクトする", async () => {
+      getUserMock.mockResolvedValue({
+        data: { user: null },
+        error: retryableError,
+      });
 
       const res = await middleware(makeRequest("/mypage", auth));
 
@@ -128,6 +139,48 @@ describe("middleware", () => {
       const location = new URL(res.headers.get("location")!);
       expect(location.pathname).toBe("/auth/login");
       expect(location.searchParams.get("next")).toBe("/mypage");
+    });
+
+    it("セッション cookie なし（AuthSessionMissingError）は正常系なのでログに残さない", async () => {
+      getUserMock.mockResolvedValue({
+        data: { user: null },
+        error: Object.assign(new Error("Auth session missing!"), {
+          name: "AuthSessionMissingError",
+        }),
+      });
+
+      const res = await middleware(makeRequest("/", auth));
+
+      expect(res.status).toBe(200);
+      expect(console.error).not.toHaveBeenCalled();
+    });
+
+    it("getUser() が永久に応答しなくても 5 秒で打ち切って続行する", async () => {
+      vi.useFakeTimers();
+      try {
+        getUserMock.mockReturnValue(new Promise(() => {}));
+
+        let settled = false;
+        const pending = middleware(makeRequest("/", auth)).then((res) => {
+          settled = true;
+          return res;
+        });
+
+        await vi.advanceTimersByTimeAsync(4_999);
+        expect(settled).toBe(false);
+
+        await vi.advanceTimersByTimeAsync(1);
+        const res = await pending;
+
+        expect(settled).toBe(true);
+        expect(res.status).toBe(200);
+        expect(console.error).toHaveBeenCalledWith(
+          expect.stringContaining("timed out"),
+          expect.any(Error),
+        );
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
